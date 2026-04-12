@@ -1,0 +1,117 @@
+# Módulo 2: Perfil del Alumno
+
+## Descripción
+
+Permite que cada alumno registrado complete y mantenga actualizado su perfil con información académica y técnica. Este perfil es la base del sistema de postulaciones y del motor de sugerencias: en lugar de enviar un CV por email en cada postulación, el perfil queda adjunto automáticamente al momento de postularse a un proyecto.
+
+## Funcionalidades a implementar
+
+### Datos del perfil
+
+El alumno puede ver y editar los siguientes campos:
+
+- **Nombre y apellido**
+- **Legajo** universitario
+- **Carrera** (puede ser un enum o texto libre)
+- **Año en curso** (1 a 5)
+- **Descripción personal** (bio corta, opcional)
+- **Enlace a CV externo** (URL a Google Drive, LinkedIn, etc. — opcional)
+
+### Gestión de habilidades (tags)
+
+- El alumno puede agregar y eliminar **habilidades técnicas y blandas** desde su perfil.
+- Las habilidades se representan como etiquetas (`Skill` / `Tag`) que son entidades compartidas con el módulo de proyectos.
+- La UI debe ofrecer autocompletado con las habilidades ya existentes en el sistema, y también permitir crear nuevas.
+- Las habilidades del alumno son el insumo principal del motor de matching (Módulo 6).
+
+### Endpoints
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `GET` | `/profile/me` | Obtiene el perfil del alumno autenticado |
+| `PUT` | `/profile/me` | Actualiza los datos del perfil |
+| `POST` | `/profile/me/skills` | Agrega habilidades al perfil |
+| `DELETE` | `/profile/me/skills/:skillId` | Elimina una habilidad del perfil |
+
+Todos los endpoints requieren rol `ALUMNO`.
+
+## Estructura de código sugerida
+
+### Backend — `src/modules/profile/`
+
+```
+profile/
+├── profile.module.ts
+├── profile.controller.ts
+├── profile.service.ts
+├── entities/
+│   └── student-profile.entity.ts   # relación 1:1 con User
+└── dto/
+    └── update-profile.dto.ts
+```
+
+### Entidad `StudentProfile`
+
+```typescript
+@Entity()
+export class StudentProfile {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  user: User;
+
+  @Column({ nullable: true })
+  fullName: string;
+
+  @Column({ nullable: true })
+  studentId: string;        // legajo
+
+  @Column({ nullable: true })
+  career: string;
+
+  @Column({ nullable: true })
+  currentYear: number;
+
+  @Column({ nullable: true })
+  bio: string;
+
+  @Column({ nullable: true })
+  cvUrl: string;
+
+  @ManyToMany(() => Skill, { eager: true })
+  @JoinTable()
+  skills: Skill[];
+}
+```
+
+### Frontend — `src/`
+
+```
+pages/
+└── ProfilePage.tsx          # formulario de edición del perfil
+
+components/profile/
+├── ProfileForm.tsx           # campos editables (nombre, legajo, carrera, etc.)
+└── SkillsInput.tsx           # input con autocompletado y chips para habilidades
+```
+
+## Entidad compartida: `Skill`
+
+Las habilidades son entidades propias del sistema usadas tanto por alumnos (perfil) como por proyectos (requisitos). Conviene colocarlas en un módulo propio o en un módulo compartido (`skills`):
+
+```
+src/modules/skills/
+├── skills.module.ts
+├── skills.controller.ts     # GET /skills (listar todas, para autocompletado)
+├── skills.service.ts
+└── entities/
+    └── skill.entity.ts      # { id, name, category? }
+```
+
+## Consideraciones
+
+- El perfil se crea automáticamente (vacío) cuando el usuario se registra como ALUMNO, para garantizar que siempre exista el registro.
+- Al postularse a un proyecto (Módulo 4), el backend lee directamente el perfil del alumno autenticado; el alumno no necesita adjuntar nada extra.
+- La completitud del perfil (con habilidades cargadas) impacta directamente en la calidad de las sugerencias del motor de matching.

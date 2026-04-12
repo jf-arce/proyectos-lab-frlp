@@ -13,6 +13,8 @@ Ver descripción completa, objetivos y alcance en `docs/project-description.md`.
 ## Rules
 
 - No vuelvas a leer archivos ya leídos en esta sesión a menos que te lo pida. Minimiza las llamadas a herramientas y trabaja con lo que ya tienes en contexto.
+- Si necesitas información adicional, haz preguntas específicas para que te la proporcione.
+- No asumas nada que no esté explícitamente documentado. Si algo no está claro, haz preguntas para aclararlo.
 
 ## Development Setup
 

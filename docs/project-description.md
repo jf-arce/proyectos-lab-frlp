@@ -29,68 +29,64 @@ El sistema se enfocara en:
 
 Gestiona el acceso al sistema y define los permisos según el tipo de usuario.
 
-**Funcionalidades:**
+* Registro y login con email/contraseña y emisión de token JWT.
+* Dos roles: `ALUMNO` y `RESPONSABLE_LABORATORIO`.
+* Rutas y endpoints protegidos por guards según rol.
+* El responsable queda vinculado a un laboratorio específico.
 
-* Registro con email y contraseña (con validación y hasheo seguro).  
-* Autenticación mediante email y contraseña con emisión de token JWT.  
-* Dos roles principales: ALUMNO y RESPONSABLE LABORATORIO.  
-* Rutas y endpoints protegidos según rol (Guards en backend, rutas protegidas en frontend).  
-* El rol RESPONSABLE LABORATORIO está asociado a un laboratorio específico; solo puede gestionar los proyectos de ese laboratorio.  
-* Expiración configurable del token y manejo de sesión en frontend.
+→ Detalle completo en [`docs/modules/01-auth-roles.md`](modules/01-auth-roles.md)
 
 ### **3.2 Módulo 2: Perfil del Alumno**
 
-Permite que el alumno complete y administre su información personal relevante para la postulación a proyectos.
+Permite que el alumno complete y administre su información personal relevante para la postulación.
 
-**Funcionalidades:**
+* Perfil editable: datos personales, legajo, carrera, año en curso.
+* Habilidades técnicas y blandas como etiquetas (tags).
+* Enlace a CV (opcional).
+* El perfil se adjunta automáticamente al postularse, sin pasos adicionales.
 
-* Perfil editable: datos personales, legajo, carrera, año en curso.  
-* Carga de habilidades técnicas y blandas mediante etiquetas (tags).  
-* Carga o enlace a CV (opcional).  
-* El perfil completo queda disponible automáticamente al momento de postularse, sin necesidad de adjuntar manualmente.
+→ Detalle completo en [`docs/modules/02-perfil-alumno.md`](modules/02-perfil-alumno.md)
 
 ### **3.3 Módulo 3: Gestión de Proyectos por Laboratorio**
 
-Permite a los responsables de laboratorio publicar, editar y administrar los proyectos activos de su laboratorio.
+Permite a los responsables publicar, editar y administrar los proyectos de su laboratorio.
 
-**Funcionalidades:**
+* CRUD completo de proyectos (título, descripción, requisitos, cupo, estado).
+* Habilidades requeridas por proyecto mediante etiquetas.
+* Listado de postulaciones recibidas con cambio de estado (pendiente / aceptada / rechazada).
+* Control de acceso: cada responsable solo gestiona su propio laboratorio.
 
-* CRUD completo de proyectos (título, descripción, requisitos, cupo, estado: activo/cerrado).  
-* Asociación de etiquetas de habilidades requeridas por proyecto.  
-* Visualización del listado de postulaciones recibidas por proyecto.  
-* Cambio de estado de una postulación (pendiente, aceptada, rechazada).  
-* Control de acceso: solo el responsable del laboratorio asociado puede gestionar sus proyectos.
+→ Detalle completo en [`docs/modules/03-gestion-proyectos.md`](modules/03-gestion-proyectos.md)
 
 ### **3.4 Módulo 4: Exploración y Postulación Online**
 
 Permite a los alumnos descubrir proyectos disponibles y postularse desde la plataforma.
 
-**Funcionalidades:**
+* Listado de proyectos activos con filtros por laboratorio, habilidades y texto libre.
+* Vista de detalle de cada proyecto con información completa.
+* Postulación con un clic; un alumno no puede postularse dos veces al mismo proyecto.
+* Historial de postulaciones del alumno con estado actualizado.
 
-* Listado de proyectos activos con filtros por laboratorio, área temática y habilidades requeridas.  
-* Vista de detalle de cada proyecto con información completa y datos del laboratorio.  
-* Postulación con un clic: el sistema adjunta automáticamente el perfil del alumno.  
-* Historial de postulaciones del alumno con estado actualizado de cada una.  
-* Un alumno no puede postularse dos veces al mismo proyecto.
+→ Detalle completo en [`docs/modules/04-exploracion-postulacion.md`](modules/04-exploracion-postulacion.md)
 
 ### **3.5 Módulo 5: Notificaciones**
 
 Mantiene informados a los usuarios sobre eventos relevantes dentro de la plataforma.
 
-**Funcionalidades:**
+* Notificación al alumno cuando su postulación es aceptada o rechazada.
+* Notificación al responsable cuando un alumno se postula a uno de sus proyectos.
+* Notificaciones in-app con indicador de no leídas en el header.
+* Notificaciones por email para eventos clave.
 
-* Notificación al alumno cuando el estado de su postulación cambia (aceptada / rechazada).  
-* Notificación al responsable de laboratorio cuando un nuevo alumno se postula a uno de sus proyectos.  
-* Notificaciones in-app: indicador de no leídas accesible desde el header de la aplicación.  
-* Notificaciones por email para eventos clave (configurables).
+→ Detalle completo en [`docs/modules/05-notificaciones.md`](modules/05-notificaciones.md)
 
 ### **3.6 Módulo 6: Matching Alumno-Proyecto (Motor de Sugerencias)**
 
-Sugiere proyectos relevantes al alumno en función de la compatibilidad entre su perfil y los requisitos de cada proyecto.
+Sugiere proyectos relevantes al alumno según la compatibilidad con su perfil.
 
-**Funcionalidades:**
+* Scoring basado en la intersección entre habilidades del alumno y requisitos del proyecto.
+* Vista personalizada "Proyectos recomendados" ordenada por puntaje.
+* Puntaje recalculado dinámicamente al actualizar el perfil.
+* Proyectos ya postulados o cerrados excluidos de las sugerencias.
 
-* Algoritmo de scoring basado en la intersección entre las habilidades del alumno y las etiquetas requeridas por el proyecto.  
-* Vista personalizada de "Proyectos recomendados" ordenada por puntaje de compatibilidad.  
-* El puntaje se recalcula dinámicamente al actualizar el perfil del alumno.  
-* Los proyectos ya postulados o cerrados quedan excluidos de las sugerencias.
+→ Detalle completo en [`docs/modules/06-matching.md`](modules/06-matching.md)
