@@ -56,3 +56,5 @@ proyectos-lab-frlp/
 - **Local DB:** Docker (PostgreSQL 16 on port 5433)
 - **Container name:** `proyectos_lab_db`
 - **Database name:** `lab_frlp`
+
+> Ver [ADR-001](decisions/001-infraestructura-local-y-produccion.md) para la justificacion de estas decisiones.

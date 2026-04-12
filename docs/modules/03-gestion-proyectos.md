@@ -14,12 +14,10 @@ Un proyecto tiene los siguientes atributos:
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `title` | string | Nombre del proyecto |
-| `description` | text | Descripción detallada |
-| `requirements` | text | Requisitos adicionales en texto libre |
-| `capacity` | number | Cupos disponibles |
-| `status` | enum | `ACTIVE` \| `CLOSED` |
-| `laboratory` | relación | Laboratorio al que pertenece |
+| `titulo` | string | Nombre del proyecto |
+| `descripcion` | text | Descripción detallada |
+| `estado` | enum | `ACTIVO` \| `CERRADO` |
+| `laboratorio` | relación | Laboratorio al que pertenece |
 | `skills` | relación M:N | Habilidades requeridas (tags) |
 
 ### Endpoints de gestión (rol RESPONSABLE_LABORATORIO)
@@ -29,7 +27,7 @@ Un proyecto tiene los siguientes atributos:
 | `POST` | `/projects` | Crear un proyecto nuevo |
 | `PUT` | `/projects/:id` | Editar un proyecto existente |
 | `DELETE` | `/projects/:id` | Eliminar un proyecto |
-| `PATCH` | `/projects/:id/status` | Cambiar estado (ACTIVE / CLOSED) |
+| `PATCH` | `/projects/:id/status` | Cambiar estado (ACTIVO / CERRADO) |
 | `GET` | `/projects/my` | Listar proyectos del propio laboratorio |
 
 ### Gestión de postulaciones recibidas
@@ -39,7 +37,7 @@ Desde el panel del responsable, puede ver las postulaciones a cada proyecto y ca
 | Método | Ruta | Descripción |
 |--------|------|-------------|
 | `GET` | `/projects/:id/applications` | Ver postulaciones de un proyecto |
-| `PATCH` | `/applications/:id/status` | Cambiar estado: `PENDING` → `ACCEPTED` \| `REJECTED` |
+| `PATCH` | `/applications/:id/status` | Cambiar estado: `PENDIENTE` → `ACEPTADA` \| `RECHAZADA` |
 
 Al cambiar el estado de una postulación, se dispara una notificación al alumno (Módulo 5).
 
@@ -50,79 +48,79 @@ Al cambiar el estado de una postulación, se dispara una notificación al alumno
 
 ## Estructura de código sugerida
 
-### Backend — `src/modules/projects/`
+### Backend — `src/modules/proyectos/`
 
 ```
-projects/
-├── projects.module.ts
-├── projects.controller.ts
-├── projects.service.ts
+proyectos/
+├── proyectos.module.ts
+├── proyectos.controller.ts
+├── proyectos.service.ts
 ├── entities/
-│   ├── project.entity.ts
-│   └── application.entity.ts    # postulación (alumno → proyecto)
+│   ├── proyecto.entity.ts
+│   └── postulacion.entity.ts
 └── dto/
-    ├── create-project.dto.ts
-    ├── update-project.dto.ts
-    └── update-application-status.dto.ts
+    ├── create-proyecto.dto.ts
+    ├── update-proyecto.dto.ts
+    └── update-postulacion-estado.dto.ts
 ```
 
-### Entidad `Project`
+### Entidad `Proyecto`
 
 ```typescript
 @Entity()
-export class Project {
+export class Proyecto {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  title: string;
+  titulo: string;
 
   @Column('text')
-  description: string;
+  descripcion: string;
 
-  @Column('text', { nullable: true })
-  requirements: string;
+  @Column({ type: 'enum', enum: ProyectoEstado, default: ProyectoEstado.ACTIVO })
+  estado: ProyectoEstado;
 
-  @Column()
-  capacity: number;
-
-  @Column({ type: 'enum', enum: ProjectStatus, default: ProjectStatus.ACTIVE })
-  status: ProjectStatus;
-
-  @ManyToOne(() => Laboratory, { eager: true })
-  laboratory: Laboratory;
+  @ManyToOne(() => Laboratorio, { eager: true })
+  laboratorio: Laboratorio;
 
   @ManyToMany(() => Skill, { eager: true })
   @JoinTable()
   skills: Skill[];
 
-  @OneToMany(() => Application, (app) => app.project)
-  applications: Application[];
+  @OneToMany(() => Postulacion, (p) => p.proyecto)
+  postulaciones: Postulacion[];
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
 ```
 
-### Entidad `Application`
+### Entidad `Postulacion`
 
 ```typescript
 @Entity()
-export class Application {
+export class Postulacion {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User)
-  student: User;
+  @ManyToOne(() => Alumno)
+  alumno: Alumno;
 
-  @ManyToOne(() => Project, (p) => p.applications)
-  project: Project;
+  @ManyToOne(() => Proyecto, (p) => p.postulaciones)
+  proyecto: Proyecto;
 
-  @Column({ type: 'enum', enum: ApplicationStatus, default: ApplicationStatus.PENDING })
-  status: ApplicationStatus;    // PENDING | ACCEPTED | REJECTED
+  @Column({ type: 'enum', enum: PostulacionEstado, default: PostulacionEstado.PENDIENTE })
+  estado: PostulacionEstado;    // PENDIENTE | ACEPTADA | RECHAZADA
 
   @CreateDateColumn()
-  appliedAt: Date;
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
 ```
 
@@ -146,16 +144,16 @@ components/lab/
 Los laboratorios son entidades de referencia, generalmente precargadas (seed). Cada responsable queda vinculado a uno al registrarse.
 
 ```
-src/modules/laboratories/
-├── laboratories.module.ts
-├── laboratories.controller.ts   # GET /laboratories (listado público para registro)
-├── laboratories.service.ts
+src/modules/laboratorios/
+├── laboratorios.module.ts
+├── laboratorios.controller.ts   # GET /laboratorios (listado público para registro)
+├── laboratorios.service.ts
 └── entities/
-    └── laboratory.entity.ts     # { id, name, description, contactEmail }
+    └── laboratorio.entity.ts    # { id, nombre, descripcion, emailContacto }
 ```
 
 ## Consideraciones
 
-- Al cerrar un proyecto (`CLOSED`), las postulaciones pendientes deben mantenerse en la base de datos para historial, pero el proyecto debe desaparecer de las sugerencias y del listado público de activos.
-- El cambio de estado de postulación es el evento que dispara las notificaciones del Módulo 5 — el servicio de projects debe llamar al servicio de notifications (o emitir un evento interno con EventEmitter2).
+- Al cerrar un proyecto (`CERRADO`), las postulaciones pendientes deben mantenerse en la base de datos para historial, pero el proyecto debe desaparecer de las sugerencias y del listado público de activos.
+- El cambio de estado de postulación es el evento que dispara las notificaciones del Módulo 5 — el servicio de proyectos debe emitir un evento interno con `EventEmitter2` para desacoplar la lógica de notificaciones.
 - Usar `EventEmitter2` de NestJS para desacoplar la lógica de notificaciones del servicio de proyectos.

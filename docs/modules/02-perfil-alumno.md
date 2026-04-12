@@ -12,10 +12,10 @@ El alumno puede ver y editar los siguientes campos:
 
 - **Nombre y apellido**
 - **Legajo** universitario
-- **Carrera** (puede ser un enum o texto libre)
 - **Año en curso** (1 a 5)
 - **Descripción personal** (bio corta, opcional)
 - **Enlace a CV externo** (URL a Google Drive, LinkedIn, etc. — opcional)
+- **Archivo CV** (subido al servidor — opcional; se almacena la ruta relativa)
 
 ### Gestión de habilidades (tags)
 
@@ -37,42 +37,42 @@ Todos los endpoints requieren rol `ALUMNO`.
 
 ## Estructura de código sugerida
 
-### Backend — `src/modules/profile/`
+### Backend — `src/modules/alumnos/`
 
 ```
-profile/
-├── profile.module.ts
-├── profile.controller.ts
-├── profile.service.ts
+alumnos/
+├── alumnos.module.ts
+├── alumnos.controller.ts
+├── alumnos.service.ts
 ├── entities/
-│   └── student-profile.entity.ts   # relación 1:1 con User
+│   └── alumno.entity.ts   # relación 1:1 con User
 └── dto/
-    └── update-profile.dto.ts
+    └── update-alumno.dto.ts
 ```
 
-### Entidad `StudentProfile`
+### Entidad `Alumno`
 
 ```typescript
 @Entity()
-export class StudentProfile {
+export class Alumno {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @OneToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn()
-  user: User;
+  usuario: User;
 
   @Column({ nullable: true })
-  fullName: string;
+  nombre: string;
 
   @Column({ nullable: true })
-  studentId: string;        // legajo
+  apellido: string;
 
   @Column({ nullable: true })
-  career: string;
+  legajo: string;
 
   @Column({ nullable: true })
-  currentYear: number;
+  anioEnCurso: number;
 
   @Column({ nullable: true })
   bio: string;
@@ -80,9 +80,15 @@ export class StudentProfile {
   @Column({ nullable: true })
   cvUrl: string;
 
+  @Column({ nullable: true })
+  cvArchivoPath: string;
+
   @ManyToMany(() => Skill, { eager: true })
   @JoinTable()
   skills: Skill[];
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
 ```
 
@@ -112,6 +118,7 @@ src/modules/skills/
 
 ## Consideraciones
 
-- El perfil se crea automáticamente (vacío) cuando el usuario se registra como ALUMNO, para garantizar que siempre exista el registro.
-- Al postularse a un proyecto (Módulo 4), el backend lee directamente el perfil del alumno autenticado; el alumno no necesita adjuntar nada extra.
+- El registro `Alumno` se crea automáticamente (vacío) cuando el usuario se registra con rol `ALUMNO`, para garantizar que siempre exista el registro.
+- Al postularse a un proyecto (Módulo 4), el backend lee directamente el `Alumno` del usuario autenticado; el alumno no necesita adjuntar nada extra.
+- El alumno puede cargar `cvArchivoPath` (archivo al servidor), `cvUrl` (link externo), ambos, o ninguno. Ambos campos son nullables.
 - La completitud del perfil (con habilidades cargadas) impacta directamente en la calidad de las sugerencias del motor de matching.
