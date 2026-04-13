@@ -1,26 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User, UserRole } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { email } });
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findById(id: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { id } });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async create(
+    email: string,
+    hashedPassword: string,
+    rol: UserRole,
+    laboratorioId?: string,
+  ): Promise<User> {
+    const user = this.userRepository.create({
+      email,
+      password: hashedPassword,
+      rol,
+      laboratorioId: laboratorioId ?? null,
+    });
+    return this.userRepository.save(user);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async emailExists(email: string): Promise<boolean> {
+    const count = await this.userRepository.count({ where: { email } });
+    return count > 0;
   }
 }
