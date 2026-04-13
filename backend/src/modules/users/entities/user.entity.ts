@@ -24,9 +24,6 @@ export class User {
   @Column({ type: 'enum', enum: UserRole })
   rol!: UserRole;
 
-  @Column({ name: 'laboratorio_id', type: 'uuid', nullable: true })
-  laboratorioId!: string | null;
-
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 }

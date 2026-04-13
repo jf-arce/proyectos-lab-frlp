@@ -2,10 +2,12 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
   IsEnum,
-  IsOptional,
+  IsInt,
   IsString,
   IsUUID,
+  Min,
   MinLength,
+  ValidateIf,
 } from 'class-validator';
 import { UserRole } from '@/modules/users/entities/user.entity';
 
@@ -27,11 +29,40 @@ export class RegisterDto {
   @IsEnum(UserRole)
   rol!: UserRole;
 
+  @ApiProperty({ example: 'Juan', description: 'Nombre del usuario' })
+  @IsString()
+  nombre!: string;
+
+  @ApiProperty({ example: 'Pérez', description: 'Apellido del usuario' })
+  @IsString()
+  apellido!: string;
+
+  // Campos requeridos solo para ALUMNO
+
+  @ApiPropertyOptional({
+    example: '12345',
+    description: 'Legajo universitario (requerido para ALUMNO)',
+  })
+  @ValidateIf((o: RegisterDto) => o.rol === UserRole.ALUMNO)
+  @IsString()
+  legajo?: string;
+
+  @ApiPropertyOptional({
+    example: 3,
+    description: 'Año de la carrera que está cursando (requerido para ALUMNO)',
+  })
+  @ValidateIf((o: RegisterDto) => o.rol === UserRole.ALUMNO)
+  @IsInt()
+  @Min(1)
+  anioEnCurso?: number;
+
+  // Campo requerido solo para RESPONSABLE_LABORATORIO
+
   @ApiPropertyOptional({
     example: 'uuid-del-laboratorio',
-    description: 'Requerido si el rol es RESPONSABLE_LABORATORIO',
+    description: 'ID del laboratorio (requerido para RESPONSABLE_LABORATORIO)',
   })
-  @IsOptional()
+  @ValidateIf((o: RegisterDto) => o.rol === UserRole.RESPONSABLE_LABORATORIO)
   @IsUUID()
-  laboratoryId?: string;
+  laboratorioId?: string;
 }

@@ -11,7 +11,8 @@
       "Bash(npx eslint:*)",
       "Bash(cat eslint.config.mjs)",
       "Bash(cat .eslintrc.js)",
-      "Bash(cat .eslintrc.json)"
+      "Bash(cat .eslintrc.json)",
+      "Bash(xargs ls:*)"
     ]
   }
 }

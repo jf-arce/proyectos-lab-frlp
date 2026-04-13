@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { User, UserRole } from './entities/user.entity';
 
 @Injectable()
@@ -22,15 +22,14 @@ export class UsersService {
     email: string,
     hashedPassword: string,
     rol: UserRole,
-    laboratorioId?: string,
+    manager?: EntityManager,
   ): Promise<User> {
-    const user = this.userRepository.create({
-      email,
-      password: hashedPassword,
-      rol,
-      laboratorioId: laboratorioId ?? null,
-    });
-    return this.userRepository.save(user);
+    const repo = manager
+      ? manager.getRepository(User)
+      : this.userRepository;
+
+    const user = repo.create({ email, password: hashedPassword, rol });
+    return repo.save(user);
   }
 
   async emailExists(email: string): Promise<boolean> {
