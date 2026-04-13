@@ -2,11 +2,14 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '@/modules/users/entities/user.entity';
+import { Skill } from '@/modules/skills/entities/skill.entity';
 
 @Entity('alumno')
 export class Alumno {
@@ -37,6 +40,14 @@ export class Alumno {
 
   @Column({ name: 'cv_archivo_path', nullable: true, type: 'varchar' })
   cvArchivoPath!: string | null;
+
+  @ManyToMany(() => Skill, { eager: true })
+  @JoinTable({
+    name: 'alumno_skill',
+    joinColumn: { name: 'alumno_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'skill_id', referencedColumnName: 'id' },
+  })
+  skills!: Skill[];
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;

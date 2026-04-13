@@ -8,6 +8,7 @@ import { AuthModule } from '@/modules/auth/auth.module';
 import { LaboratorioModule } from '@/modules/laboratorio/laboratorio.module';
 import { AlumnoModule } from '@/modules/alumno/alumno.module';
 import { ResponsableLaboratorioModule } from '@/modules/responsable-laboratorio/responsable-laboratorio.module';
+import { SkillsModule } from '@/modules/skills/skills.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { ResponsableLaboratorioModule } from '@/modules/responsable-laboratorio/
     LaboratorioModule,
     AlumnoModule,
     ResponsableLaboratorioModule,
+    SkillsModule,
   ],
   controllers: [],
   providers: [],

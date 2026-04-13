@@ -12,7 +12,10 @@
       "Bash(cat eslint.config.mjs)",
       "Bash(cat .eslintrc.js)",
       "Bash(cat .eslintrc.json)",
-      "Bash(xargs ls:*)"
+      "Bash(xargs ls:*)",
+      "Bash(curl -s -o /dev/null -w 'HTTP %{http_code}' -X DELETE http://localhost:3000/api/profile/me/skills/f299b71b-d061-423d-8e46-87409bf138c5 -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4NDZmOGUzNC0xZjg4LTQ4YjQtOTYzNC02MzE1OTFmYTBhOTAiLCJlbWFpbCI6InRlc3QuYWx1bW5vQHRlc3QuY29tIiwicm9sZSI6IkFMVU1OTyIsImlhdCI6MTc3NjA0NTE3MiwiZXhwIjoxNzc2MDQ2MDcyfQ.LJl3XP6wkdYWuUMrTe5od46avaHbBvxEMf9H6zl_1Uk')",
+      "Bash(curl -s http://localhost:3000/api/profile/me -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4NDZmOGUzNC0xZjg4LTQ4YjQtOTYzNC02MzE1OTFmYTBhOTAiLCJlbWFpbCI6InRlc3QuYWx1bW5vQHRlc3QuY29tIiwicm9sZSI6IkFMVU1OTyIsImlhdCI6MTc3NjA0NTE3MiwiZXhwIjoxNzc2MDQ2MDcyfQ.LJl3XP6wkdYWuUMrTe5od46avaHbBvxEMf9H6zl_1Uk')",
+      "Bash(python -m json.tool)"
     ]
   }
 }
