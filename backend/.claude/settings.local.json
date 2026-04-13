@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx nest:*)",
+      "Bash(npx tsc:*)",
+      "Bash(timeout 20 npm run start:dev)",
+      "Bash(npm run:*)",
+      "Bash(curl -s http://localhost:3000/api/auth/login -X POST -H \"Content-Type: application/json\" -d \"{}\")",
+      "Bash(curl -s http://localhost:3000/api/auth/register -X POST -H \"Content-Type: application/json\" -d '{\"email\":\"test@utn.edu.ar\",\"password\":\"password123\",\"rol\":\"ALUMNO\"}')",
+      "Bash(curl -s http://localhost:3000/api/auth/register -X POST -H \"Content-Type: application/json\" -d '{\"email\":\"lab@utn.edu.ar\",\"password\":\"password123\",\"rol\":\"RESPONSABLE_LABORATORIO\"}')",
+      "Bash(npx eslint:*)",
+      "Bash(cat eslint.config.mjs)",
+      "Bash(cat .eslintrc.js)",
+      "Bash(cat .eslintrc.json)",
+      "Bash(xargs ls:*)"
+    ]
+  }
+}

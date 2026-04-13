@@ -4,6 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { databaseConfig } from './config/database.config';
 import { validationSchema } from './config/validation.schema';
 import { UsersModule } from '@/modules/users/users.module';
+import { AuthModule } from '@/modules/auth/auth.module';
+import { LaboratorioModule } from '@/modules/laboratorio/laboratorio.module';
+import { AlumnoModule } from '@/modules/alumno/alumno.module';
+import { ResponsableLaboratorioModule } from '@/modules/responsable-laboratorio/responsable-laboratorio.module';
 
 @Module({
   imports: [
@@ -32,6 +36,10 @@ import { UsersModule } from '@/modules/users/users.module';
       },
     }),
     UsersModule,
+    AuthModule,
+    LaboratorioModule,
+    AlumnoModule,
+    ResponsableLaboratorioModule,
   ],
   controllers: [],
   providers: [],
