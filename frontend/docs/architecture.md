@@ -36,20 +36,18 @@ src/
 │   │   └── register-page.tsx
 │   │
 │   ├── alumno/
-│   │   ├── components/          # Componentes exclusivos de páginas de alumno
-│   │   ├── labs-page.tsx
-│   │   ├── lab-detail-page.tsx
-│   │   ├── lab-projects-page.tsx
-│   │   ├── my-applications-page.tsx
-│   │   ├── profile-page.tsx
-│   │   ├── recommended-page.tsx
-│   │   └── notifications-page.tsx
+│   │   ├── components/              # Componentes exclusivos de páginas de alumno
+│   │   ├── dashboard-page.tsx       # /alumno/dashboard
+│   │   ├── labs-page.tsx            # /alumno/laboratorios
+│   │   ├── lab-detail-page.tsx      # /alumno/laboratorios/:id
+│   │   ├── project-detail-page.tsx  # /alumno/proyecto/:id
+│   │   └── postulaciones-page.tsx   # /alumno/postulaciones
 │   │
 │   └── responsable/
-│       ├── components/          # Componentes exclusivos de páginas de responsable
-│       ├── manage-projects-page.tsx
-│       ├── applications-received-page.tsx
-│       └── notifications-page.tsx
+│       ├── components/                      # Componentes exclusivos de páginas de responsable
+│       ├── dashboard-page.tsx               # /responsable/dashboard
+│       ├── laboratorio-page.tsx             # /responsable/laboratorio
+│       └── project-postulaciones-page.tsx   # /responsable/proyectos/:id/postulaciones
 │
 ├── services/                    # Llamadas a la API REST, una por dominio
 │   ├── auth.ts
@@ -74,29 +72,24 @@ si el usuario no está autenticado o no tiene el rol requerido.
 ```tsx
 <Routes>
   {/* Públicas */}
+  <Route path="/" element={<Navigate to="/login" replace />} />
   <Route path="/login" element={<LoginPage />} />
   <Route path="/register" element={<RegisterPage />} />
 
   {/* Alumno */}
-  <Route element={<PrivateRoute role="ALUMNO" />}>
-    <Route element={<AlumnoLayout />}>
-      <Route path="/alumno/labs" element={<LabsPage />} />
-      <Route path="/alumno/lab/:labId" element={<LabDetailPage />} />
-      <Route path="/alumno/lab/:labId/projects" element={<LabProjectsPage />} />
-      <Route path="/alumno/my-applications" element={<MyApplicationsPage />} />
-      <Route path="/alumno/profile" element={<ProfilePage />} />
-      <Route path="/alumno/recommended" element={<RecommendedPage />} />
-      <Route path="/alumno/notifications" element={<NotificationsPage />} />
-    </Route>
+  <Route element={<PrivateRoute allowedRoles={[Role.ALUMNO]} />}>
+    <Route path="/alumno/dashboard" element={<AlumnoDashboardPage />} />
+    <Route path="/alumno/laboratorios" element={<LaboratoriosPage />} />
+    <Route path="/alumno/laboratorios/:id" element={<LaboratorioDetailPage />} />
+    <Route path="/alumno/proyecto/:id" element={<ProjectDetailPage />} />
+    <Route path="/alumno/postulaciones" element={<PostulacionesPage />} />
   </Route>
 
   {/* Responsable */}
-  <Route element={<PrivateRoute role="RESPONSABLE_LABORATORIO" />}>
-    <Route element={<ResponsableLayout />}>
-      <Route path="/responsable/manage-projects" element={<ManageProjectsPage />} />
-      <Route path="/responsable/applications" element={<ApplicationsReceivedPage />} />
-      <Route path="/responsable/notifications" element={<NotificationsPage />} />
-    </Route>
+  <Route element={<PrivateRoute allowedRoles={[Role.RESPONSABLE_LABORATORIO]} />}>
+    <Route path="/responsable/dashboard" element={<ResponsableDashboardPage />} />
+    <Route path="/responsable/laboratorio" element={<LaboratorioPage />} />
+    <Route path="/responsable/proyectos/:id/postulaciones" element={<ProjectPostulacionesPage />} />
   </Route>
 </Routes>
 ```

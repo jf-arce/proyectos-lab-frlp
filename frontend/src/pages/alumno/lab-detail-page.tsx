@@ -1,1 +1,5 @@
-// Detalle de un laboratorio: descripción completa, equipo y proyectos destacados
+// Detalle de un laboratorio: header (nombre, logo, descripción, contacto) y listado de proyectos del laboratorio
+
+export function LaboratorioDetailPage() {
+  return null;
+}

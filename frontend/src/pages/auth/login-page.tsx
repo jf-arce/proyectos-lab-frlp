@@ -32,8 +32,8 @@ type FormValues = z.infer<typeof schema>;
 
 function roleHome(role: string) {
   return role === Role.RESPONSABLE_LABORATORIO
-    ? '/responsable/manage-projects'
-    : '/alumno/labs';
+    ? '/responsable/dashboard'
+    : '/alumno/dashboard';
 }
 
 export function LoginPage() {
