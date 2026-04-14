@@ -169,7 +169,7 @@ export function RegisterPage() {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Año" />
                           </SelectTrigger>
                         </FormControl>
