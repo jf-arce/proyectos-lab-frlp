@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import './index.css';
 import { AuthProvider } from '@/context/auth-context';
 import { PrivateRoute } from '@/components/private-route';
+import { Role } from '@/types/auth';
 import { LoginPage } from '@/pages/auth/login-page';
 import { RegisterPage } from '@/pages/auth/register-page';
 
@@ -25,13 +26,15 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/register" element={<RegisterPage />} />
 
         {/* Alumno */}
-        <Route element={<PrivateRoute allowedRoles={['ALUMNO']} />}>
+        <Route element={<PrivateRoute allowedRoles={[Role.ALUMNO]} />}>
           <Route path="/alumno/projects" element={<ProjectsPage />} />
         </Route>
 
         {/* Responsable de laboratorio */}
         <Route
-          element={<PrivateRoute allowedRoles={['RESPONSABLE_LABORATORIO']} />}
+          element={
+            <PrivateRoute allowedRoles={[Role.RESPONSABLE_LABORATORIO]} />
+          }
         >
           <Route
             path="/responsable/manage-projects"

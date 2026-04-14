@@ -4,6 +4,7 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/use-auth';
+import { Role } from '@/types/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -23,14 +24,14 @@ import {
 } from '@/components/ui/form';
 
 const schema = z.object({
-  email: z.string().email('Ingresá un email válido'),
+  email: z.email('Ingresá un email válido'),
   password: z.string().min(1, 'La contraseña es obligatoria'),
 });
 
 type FormValues = z.infer<typeof schema>;
 
 function roleHome(role: string) {
-  return role === 'RESPONSABLE_LABORATORIO'
+  return role === Role.RESPONSABLE_LABORATORIO
     ? '/responsable/manage-projects'
     : '/alumno/projects';
 }

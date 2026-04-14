@@ -1,4 +1,9 @@
-export type Role = 'ALUMNO' | 'RESPONSABLE_LABORATORIO';
+export const Role = {
+  ALUMNO: 'ALUMNO',
+  RESPONSABLE_LABORATORIO: 'RESPONSABLE_LABORATORIO',
+} as const;
+
+export type Role = (typeof Role)[keyof typeof Role];
 
 export interface AuthResponse {
   accessToken: string;

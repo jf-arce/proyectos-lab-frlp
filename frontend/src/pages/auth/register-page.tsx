@@ -4,6 +4,7 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { authService } from '@/services/auth';
+import { Role } from '@/types/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -32,7 +33,7 @@ import {
 const schema = z.object({
   nombre: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   apellido: z.string().min(2, 'El apellido debe tener al menos 2 caracteres'),
-  email: z.string().email('Ingresá un email válido'),
+  email: z.email('Ingresá un email válido'),
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
   legajo: z.string().min(1, 'El legajo es obligatorio'),
   anioEnCurso: z.string().min(1, 'Seleccioná un año'),
@@ -60,7 +61,7 @@ export function RegisterPage() {
     try {
       await authService.register({
         ...values,
-        rol: 'ALUMNO',
+        rol: Role.ALUMNO,
         anioEnCurso: Number(values.anioEnCurso),
       });
       toast.success('Cuenta creada correctamente. Ya podés iniciar sesión.');
