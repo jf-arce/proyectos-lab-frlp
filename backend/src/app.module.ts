@@ -10,6 +10,7 @@ import { AlumnoModule } from '@/modules/alumno/alumno.module';
 import { ResponsableLaboratorioModule } from '@/modules/responsable-laboratorio/responsable-laboratorio.module';
 import { SkillsModule } from '@/modules/skills/skills.module';
 import { ProyectosModule } from '@/modules/proyectos/proyectos.module';
+import { PostulacionesModule } from '@/modules/postulaciones/postulaciones.module';
 
 @Module({
   imports: [
@@ -44,9 +45,9 @@ import { ProyectosModule } from '@/modules/proyectos/proyectos.module';
     ResponsableLaboratorioModule,
     SkillsModule,
     ProyectosModule,
+    PostulacionesModule,
   ],
   controllers: [],
   providers: [],
 })
 export class AppModule {}
-

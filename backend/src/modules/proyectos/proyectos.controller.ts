@@ -27,10 +27,8 @@ import { UserRole } from '@/modules/users/entities/user.entity';
 import { ProyectosService } from './proyectos.service';
 import { CreateProyectoDto } from './dto/create-proyecto.dto';
 import { UpdateProyectoDto } from './dto/update-proyecto.dto';
-import { UpdatePostulacionEstadoDto } from './dto/update-postulacion-estado.dto';
 import { ChangeStatusDto } from './dto/change-status.dto';
 import { Proyecto } from './entities/proyecto.entity';
-import { Postulacion } from './entities/postulacion.entity';
 
 interface AuthenticatedRequest extends Request {
   user: {
@@ -47,8 +45,6 @@ interface AuthenticatedRequest extends Request {
 @Controller()
 export class ProyectosController {
   constructor(private readonly proyectosService: ProyectosService) {}
-
-  // ─── Proyectos ────────────────────────────────────────────────────────────
 
   @Post('projects')
   @Roles(UserRole.RESPONSABLE_LABORATORIO)
@@ -121,46 +117,5 @@ export class ProyectosController {
     @Body() dto: ChangeStatusDto,
   ): Promise<Proyecto> {
     return this.proyectosService.changeStatus(id, dto, req.user.laboratorioId!);
-  }
-
-  // ─── Postulaciones ────────────────────────────────────────────────────────
-
-  @Get('projects/:id/applications')
-  @Roles(UserRole.RESPONSABLE_LABORATORIO)
-  @ApiOperation({ summary: 'Ver postulaciones recibidas para un proyecto' })
-  @ApiResponse({
-    status: 200,
-    description: 'Lista de postulaciones.',
-    type: [Postulacion],
-  })
-  getApplications(
-    @Req() req: AuthenticatedRequest,
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<Postulacion[]> {
-    return this.proyectosService.getApplications(id, req.user.laboratorioId!);
-  }
-
-  @Patch('applications/:id/status')
-  @Roles(UserRole.RESPONSABLE_LABORATORIO)
-  @ApiOperation({ summary: 'Aceptar o rechazar una postulación' })
-  @ApiResponse({
-    status: 200,
-    description: 'Estado actualizado.',
-    type: Postulacion,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Estado inválido (no se puede volver a PENDIENTE).',
-  })
-  updateApplicationStatus(
-    @Req() req: AuthenticatedRequest,
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdatePostulacionEstadoDto,
-  ): Promise<Postulacion> {
-    return this.proyectosService.updateApplicationStatus(
-      id,
-      dto,
-      req.user.laboratorioId!,
-    );
   }
 }

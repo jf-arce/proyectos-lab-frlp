@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum } from 'class-validator';
-import { PostulacionEstado } from '../enums/proyectos-estados.enum';
+import { PostulacionEstado } from '../enums/postulacion-estado.enum';
 
 export class UpdatePostulacionEstadoDto {
   @ApiProperty({

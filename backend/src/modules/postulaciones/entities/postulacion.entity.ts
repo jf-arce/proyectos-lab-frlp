@@ -9,8 +9,8 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Alumno } from '@/modules/alumno/entities/alumno.entity';
-import { Proyecto } from './proyecto.entity';
-import { PostulacionEstado } from '../enums/proyectos-estados.enum';
+import { Proyecto } from '@/modules/proyectos/entities/proyecto.entity';
+import { PostulacionEstado } from '../enums/postulacion-estado.enum';
 
 @Entity('postulacion')
 export class Postulacion {

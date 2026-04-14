@@ -14,7 +14,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Laboratorio } from '@/modules/laboratorio/entities/laboratorio.entity';
 import { Skill } from '@/modules/skills/entities/skill.entity';
 import { ProyectoEstado } from '../enums/proyectos-estados.enum';
-import { Postulacion } from './postulacion.entity';
+import { Postulacion } from '@/modules/postulaciones/entities/postulacion.entity';
 
 @Entity('proyecto')
 export class Proyecto {

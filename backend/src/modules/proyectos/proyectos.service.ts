@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -9,19 +8,14 @@ import { Repository } from 'typeorm';
 import { SkillsService } from '@/modules/skills/skills.service';
 import { CreateProyectoDto } from './dto/create-proyecto.dto';
 import { UpdateProyectoDto } from './dto/update-proyecto.dto';
-import { UpdatePostulacionEstadoDto } from './dto/update-postulacion-estado.dto';
 import { ChangeStatusDto } from './dto/change-status.dto';
 import { Proyecto } from './entities/proyecto.entity';
-import { Postulacion } from './entities/postulacion.entity';
-import { PostulacionEstado } from './enums/proyectos-estados.enum';
 
 @Injectable()
 export class ProyectosService {
   constructor(
     @InjectRepository(Proyecto)
     private readonly proyectoRepository: Repository<Proyecto>,
-    @InjectRepository(Postulacion)
-    private readonly postulacionRepository: Repository<Postulacion>,
     private readonly skillsService: SkillsService,
   ) {}
 
@@ -81,47 +75,6 @@ export class ProyectosService {
 
     proyecto.estado = dto.estado;
     return this.proyectoRepository.save(proyecto);
-  }
-
-  async getApplications(
-    projectId: string,
-    laboratorioId: string,
-  ): Promise<Postulacion[]> {
-    const proyecto = await this.findOneOrFail(projectId);
-    this.checkOwnership(proyecto, laboratorioId);
-
-    return this.postulacionRepository.find({
-      where: { proyecto: { id: projectId } },
-      order: { createdAt: 'DESC' },
-    });
-  }
-
-  async updateApplicationStatus(
-    appId: string,
-    dto: UpdatePostulacionEstadoDto,
-    laboratorioId: string,
-  ): Promise<Postulacion> {
-    const postulacion = await this.postulacionRepository.findOne({
-      where: { id: appId },
-      relations: { proyecto: { laboratorio: true } },
-    });
-
-    if (!postulacion) {
-      throw new NotFoundException(`Postulación con id ${appId} no encontrada`);
-    }
-
-    if (postulacion.proyecto.laboratorio.id !== laboratorioId) {
-      throw new ForbiddenException(
-        'No tenés permiso para modificar esta postulación',
-      );
-    }
-
-    if (dto.estado === PostulacionEstado.PENDIENTE) {
-      throw new BadRequestException('No se puede volver al estado PENDIENTE');
-    }
-
-    postulacion.estado = dto.estado;
-    return this.postulacionRepository.save(postulacion);
   }
 
   private async findOneOrFail(id: string): Promise<Proyecto> {

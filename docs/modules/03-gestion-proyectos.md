@@ -39,6 +39,8 @@ Desde el panel del responsable, puede ver las postulaciones a cada proyecto y ca
 | `GET` | `/projects/:id/applications` | Ver postulaciones de un proyecto |
 | `PATCH` | `/applications/:id/status` | Cambiar estado: `PENDIENTE` → `ACEPTADA` \| `RECHAZADA` |
 
+> Estos endpoints están implementados en `PostulacionesController` (`src/modules/postulaciones/`), no en `ProyectosController`. Ver estructura en el Módulo 4.
+
 Al cambiar el estado de una postulación, se dispara una notificación al alumno (Módulo 5).
 
 ### Control de acceso
@@ -56,11 +58,27 @@ proyectos/
 ├── proyectos.controller.ts
 ├── proyectos.service.ts
 ├── entities/
-│   ├── proyecto.entity.ts
-│   └── postulacion.entity.ts
+│   └── proyecto.entity.ts
+├── enums/
+│   └── proyectos-estados.enum.ts   # ProyectoEstado (ACTIVO | CERRADO)
 └── dto/
     ├── create-proyecto.dto.ts
     ├── update-proyecto.dto.ts
+    └── change-status.dto.ts
+```
+
+La entidad `Postulacion` y su lógica viven en un módulo independiente:
+
+```
+postulaciones/
+├── postulaciones.module.ts
+├── postulaciones.controller.ts
+├── postulaciones.service.ts
+├── entities/
+│   └── postulacion.entity.ts
+├── enums/
+│   └── postulacion-estado.enum.ts  # PostulacionEstado (PENDIENTE | ACEPTADA | RECHAZADA)
+└── dto/
     └── update-postulacion-estado.dto.ts
 ```
 
@@ -101,13 +119,15 @@ export class Proyecto {
 
 ### Entidad `Postulacion`
 
+> Implementada en `src/modules/postulaciones/entities/postulacion.entity.ts`.
+
 ```typescript
 @Entity()
 export class Postulacion {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Alumno)
+  @ManyToOne(() => Alumno, { eager: true })
   alumno: Alumno;
 
   @ManyToOne(() => Proyecto, (p) => p.postulaciones)
