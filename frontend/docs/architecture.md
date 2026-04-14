@@ -37,8 +37,9 @@ src/
 │   │
 │   ├── alumno/
 │   │   ├── components/          # Componentes exclusivos de páginas de alumno
-│   │   ├── projects-page.tsx
-│   │   ├── project-detail-page.tsx
+│   │   ├── labs-page.tsx
+│   │   ├── lab-detail-page.tsx
+│   │   ├── lab-projects-page.tsx
 │   │   ├── my-applications-page.tsx
 │   │   ├── profile-page.tsx
 │   │   ├── recommended-page.tsx
@@ -79,21 +80,22 @@ si el usuario no está autenticado o no tiene el rol requerido.
   {/* Alumno */}
   <Route element={<PrivateRoute role="ALUMNO" />}>
     <Route element={<AlumnoLayout />}>
-      <Route path="/proyectos" element={<ProjectsPage />} />
-      <Route path="/proyectos/:id" element={<ProjectDetailPage />} />
-      <Route path="/mis-postulaciones" element={<MyApplicationsPage />} />
-      <Route path="/perfil" element={<ProfilePage />} />
-      <Route path="/recomendados" element={<RecommendedPage />} />
-      <Route path="/notificaciones" element={<NotificationsPage />} />
+      <Route path="/alumno/labs" element={<LabsPage />} />
+      <Route path="/alumno/lab/:labId" element={<LabDetailPage />} />
+      <Route path="/alumno/lab/:labId/projects" element={<LabProjectsPage />} />
+      <Route path="/alumno/my-applications" element={<MyApplicationsPage />} />
+      <Route path="/alumno/profile" element={<ProfilePage />} />
+      <Route path="/alumno/recommended" element={<RecommendedPage />} />
+      <Route path="/alumno/notifications" element={<NotificationsPage />} />
     </Route>
   </Route>
 
   {/* Responsable */}
   <Route element={<PrivateRoute role="RESPONSABLE_LABORATORIO" />}>
     <Route element={<ResponsableLayout />}>
-      <Route path="/mis-proyectos" element={<ManageProjectsPage />} />
-      <Route path="/postulaciones" element={<ApplicationsReceivedPage />} />
-      <Route path="/notificaciones" element={<NotificationsPage />} />
+      <Route path="/responsable/manage-projects" element={<ManageProjectsPage />} />
+      <Route path="/responsable/applications" element={<ApplicationsReceivedPage />} />
+      <Route path="/responsable/notifications" element={<NotificationsPage />} />
     </Route>
   </Route>
 </Routes>

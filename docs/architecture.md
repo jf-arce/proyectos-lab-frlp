@@ -19,10 +19,15 @@ proyectos-lab-frlp/
 │           └── <feature>/      # module, controller, service, entities, DTOs
 ├── frontend/         # React 19 + Vite SPA
 │   └── src/
-│       ├── components/         # Shared UI components (shadcn/ui)
-│       ├── lib/                # Utilities (cn helper, etc.)
-│       ├── App.tsx
-│       └── main.tsx
+│       ├── components/         # Componentes compartidos (shadcn/ui en ui/, guards en raíz)
+│       ├── context/            # Providers globales (AuthContext)
+│       ├── hooks/              # Custom hooks (useAuth, etc.)
+│       ├── layouts/            # Layouts con navbar por rol
+│       ├── lib/                # Utilidades (cn helper, etc.)
+│       ├── pages/              # Páginas agrupadas por rol: auth/, alumno/, responsable/
+│       ├── services/           # Llamadas a la API REST, una por dominio
+│       ├── types/              # Tipos TypeScript compartidos
+│       └── main.tsx            # Entry point: rutas y providers
 ├── docs/
 │   ├── architecture.md
 │   ├── decisions/              # Architecture Decision Records (ADRs)

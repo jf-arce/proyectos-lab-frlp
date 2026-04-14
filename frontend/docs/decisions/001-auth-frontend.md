@@ -67,7 +67,7 @@ Mientras `isLoading` es `true` (restaurando sesión), renderiza `null` para evit
 Uso en routing:
 ```tsx
 <Route element={<PrivateRoute allowedRoles={['ALUMNO']} />}>
-  <Route path="/alumno/projects" element={<ProjectsPage />} />
+  <Route path="/alumno/labs" element={<LabsPage />} />
 </Route>
 ```
 

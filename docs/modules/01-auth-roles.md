@@ -72,8 +72,9 @@ components/
 └── PrivateRoute.tsx          # redirige si no autenticado o sin el rol requerido
 
 pages/
-├── LoginPage.tsx
-└── RegisterPage.tsx
+├── auth/
+│   ├── login-page.tsx
+│   └── register-page.tsx
 ```
 
 ## Dependencias y paquetes
