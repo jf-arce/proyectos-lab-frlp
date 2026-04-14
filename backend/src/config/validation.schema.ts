@@ -13,4 +13,5 @@ export const validationSchema = Joi.object({
   JWT_SECRET: Joi.string().required(),
   JWT_EXPIRATION: Joi.string().default('15m'),
   REFRESH_TOKEN_EXPIRATION_DAYS: Joi.number().default(7),
+  CORS_ORIGINS: Joi.string().default('http://localhost:5173'),
 });

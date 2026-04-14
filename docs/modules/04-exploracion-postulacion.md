@@ -93,15 +93,18 @@ if (filters.search) {
 
 ```
 pages/
-├── ProjectsPage.tsx            # listado con filtros laterales/superiores
-├── ProjectDetailPage.tsx       # detalle + botón de postulación
-└── MyApplicationsPage.tsx      # historial de postulaciones del alumno
+└── alumno/
+    ├── labs-page.tsx               # listado de laboratorios con descripción breve y preview de proyectos
+    ├── lab-detail-page.tsx         # detalle de un lab: descripción, equipo y proyectos destacados
+    ├── lab-projects-page.tsx       # todos los proyectos activos del lab, con filtros y botón de postulación
+    └── my-applications-page.tsx    # historial de postulaciones del alumno
 
-components/projects/
-├── ProjectCard.tsx             # tarjeta en el listado
-├── ProjectFilters.tsx          # panel de filtros (laboratorio, habilidades, búsqueda)
-├── ApplyButton.tsx             # botón que maneja el estado (postularse / ya postulado)
-└── ApplicationStatusBadge.tsx  # badge con color por estado
+components/alumno/
+├── lab-card.tsx                    # tarjeta de laboratorio en el listado
+├── project-card.tsx                # tarjeta de proyecto en el listado del lab
+├── project-filters.tsx             # panel de filtros (habilidades, búsqueda)
+├── apply-button.tsx                # botón que maneja el estado (postularse / ya postulado)
+└── application-status-badge.tsx    # badge con color por estado
 ```
 
 ## Consideraciones

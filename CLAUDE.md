@@ -15,6 +15,8 @@ Ver descripción completa, objetivos y alcance en `docs/project-description.md`.
 - No vuelvas a leer archivos ya leídos en esta sesión a menos que te lo pida. Minimiza las llamadas a herramientas y trabaja con lo que ya tienes en contexto.
 - Si necesitas información adicional, haz preguntas específicas para que te la proporcione.
 - No asumas nada que no esté explícitamente documentado. Si algo no está claro, haz preguntas para aclararlo.
+- Siempre que termines de realizar algo con exito actualiza la documentación correspondiente para que el equipo humano tenga la información más actualizada.
+- Si encuentras errores o inconsistencias en la documentación, notifícalo para que se puedan corregir.
 
 ## Development Setup
 

@@ -128,15 +128,15 @@ export class Postulacion {
 
 ```
 pages/
-└── lab/
-    ├── LabDashboardPage.tsx         # panel principal del responsable
-    ├── ProjectFormPage.tsx          # crear / editar proyecto
-    └── ProjectApplicationsPage.tsx  # ver postulaciones de un proyecto
+└── responsable/
+    ├── manage-projects-page.tsx     # panel principal del responsable
+    ├── project-form-page.tsx        # crear / editar proyecto
+    └── project-applications-page.tsx  # ver postulaciones de un proyecto
 
-components/lab/
-├── ProjectCard.tsx                  # tarjeta de proyecto en el dashboard
-├── ApplicationRow.tsx               # fila de postulación con botones de acción
-└── SkillsSelector.tsx               # selector de habilidades requeridas
+components/responsable/
+├── project-card.tsx                 # tarjeta de proyecto en el dashboard
+├── application-row.tsx              # fila de postulación con botones de acción
+└── skills-selector.tsx              # selector de habilidades requeridas
 ```
 
 ## Entidad: `Laboratory`
