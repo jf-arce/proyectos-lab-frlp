@@ -28,7 +28,10 @@ export class Postulacion {
   @JoinColumn({ name: 'proyecto_id' })
   proyecto!: Proyecto;
 
-  @ApiProperty({ enum: PostulacionEstado, default: PostulacionEstado.PENDIENTE })
+  @ApiProperty({
+    enum: PostulacionEstado,
+    default: PostulacionEstado.PENDIENTE,
+  })
   @Column({
     type: 'enum',
     enum: PostulacionEstado,

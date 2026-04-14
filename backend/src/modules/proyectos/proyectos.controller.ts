@@ -65,7 +65,11 @@ export class ProyectosController {
   @Get('projects/my')
   @Roles(UserRole.RESPONSABLE_LABORATORIO)
   @ApiOperation({ summary: 'Listar proyectos del propio laboratorio' })
-  @ApiResponse({ status: 200, description: 'Lista de proyectos.', type: [Proyecto] })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de proyectos.',
+    type: [Proyecto],
+  })
   findMyProjects(@Req() req: AuthenticatedRequest): Promise<Proyecto[]> {
     return this.proyectosService.findMyProjects(req.user.laboratorioId!);
   }
@@ -73,7 +77,11 @@ export class ProyectosController {
   @Put('projects/:id')
   @Roles(UserRole.RESPONSABLE_LABORATORIO)
   @ApiOperation({ summary: 'Editar un proyecto existente' })
-  @ApiResponse({ status: 200, description: 'Proyecto actualizado.', type: Proyecto })
+  @ApiResponse({
+    status: 200,
+    description: 'Proyecto actualizado.',
+    type: Proyecto,
+  })
   @ApiResponse({ status: 403, description: 'No es dueño del proyecto.' })
   @ApiResponse({ status: 404, description: 'Proyecto no encontrado.' })
   update(
@@ -99,8 +107,14 @@ export class ProyectosController {
 
   @Patch('projects/:id/status')
   @Roles(UserRole.RESPONSABLE_LABORATORIO)
-  @ApiOperation({ summary: 'Cambiar el estado de un proyecto (ACTIVO/CERRADO)' })
-  @ApiResponse({ status: 200, description: 'Estado actualizado.', type: Proyecto })
+  @ApiOperation({
+    summary: 'Cambiar el estado de un proyecto (ACTIVO/CERRADO)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Estado actualizado.',
+    type: Proyecto,
+  })
   changeStatus(
     @Req() req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
@@ -114,7 +128,11 @@ export class ProyectosController {
   @Get('projects/:id/applications')
   @Roles(UserRole.RESPONSABLE_LABORATORIO)
   @ApiOperation({ summary: 'Ver postulaciones recibidas para un proyecto' })
-  @ApiResponse({ status: 200, description: 'Lista de postulaciones.', type: [Postulacion] })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de postulaciones.',
+    type: [Postulacion],
+  })
   getApplications(
     @Req() req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
@@ -125,8 +143,15 @@ export class ProyectosController {
   @Patch('applications/:id/status')
   @Roles(UserRole.RESPONSABLE_LABORATORIO)
   @ApiOperation({ summary: 'Aceptar o rechazar una postulación' })
-  @ApiResponse({ status: 200, description: 'Estado actualizado.', type: Postulacion })
-  @ApiResponse({ status: 400, description: 'Estado inválido (no se puede volver a PENDIENTE).' })
+  @ApiResponse({
+    status: 200,
+    description: 'Estado actualizado.',
+    type: Postulacion,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Estado inválido (no se puede volver a PENDIENTE).',
+  })
   updateApplicationStatus(
     @Req() req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,

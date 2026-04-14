@@ -13,10 +13,7 @@ import { UpdatePostulacionEstadoDto } from './dto/update-postulacion-estado.dto'
 import { ChangeStatusDto } from './dto/change-status.dto';
 import { Proyecto } from './entities/proyecto.entity';
 import { Postulacion } from './entities/postulacion.entity';
-import {
-  PostulacionEstado,
-  ProyectoEstado,
-} from './enums/proyectos-estados.enum';
+import { PostulacionEstado } from './enums/proyectos-estados.enum';
 
 @Injectable()
 export class ProyectosService {
@@ -27,8 +24,6 @@ export class ProyectosService {
     private readonly postulacionRepository: Repository<Postulacion>,
     private readonly skillsService: SkillsService,
   ) {}
-
-  // ─── Proyectos ────────────────────────────────────────────────────────────
 
   async create(
     dto: CreateProyectoDto,
@@ -88,8 +83,6 @@ export class ProyectosService {
     return this.proyectoRepository.save(proyecto);
   }
 
-  // ─── Postulaciones ────────────────────────────────────────────────────────
-
   async getApplications(
     projectId: string,
     laboratorioId: string,
@@ -130,8 +123,6 @@ export class ProyectosService {
     postulacion.estado = dto.estado;
     return this.postulacionRepository.save(postulacion);
   }
-
-  // ─── Helpers ──────────────────────────────────────────────────────────────
 
   private async findOneOrFail(id: string): Promise<Proyecto> {
     const proyecto = await this.proyectoRepository.findOne({ where: { id } });
