@@ -10,6 +10,10 @@ export class LaboratorioService {
     private readonly laboratorioRepository: Repository<Laboratorio>,
   ) {}
 
+  findAll(): Promise<Laboratorio[]> {
+    return this.laboratorioRepository.find({ order: { nombre: 'ASC' } });
+  }
+
   findById(id: string): Promise<Laboratorio | null> {
     return this.laboratorioRepository.findOne({ where: { id } });
   }
