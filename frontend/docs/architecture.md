@@ -30,6 +30,11 @@ src/
 │   ├── alumno-layout.tsx        # Layout con navbar para páginas de alumno
 │   └── responsable-layout.tsx   # Layout con navbar para páginas de responsable
 │
+├── routes/
+│   ├── public-routes.tsx        # Rutas públicas: /, /login, /register
+│   ├── alumno-routes.tsx        # Rutas privadas del alumno (con PrivateRoute)
+│   └── responsable-routes.tsx   # Rutas privadas del responsable (con PrivateRoute)
+│
 ├── pages/
 │   ├── auth/
 │   │   ├── login-page.tsx
@@ -66,33 +71,46 @@ src/
 
 ## Routing
 
-Las rutas están separadas por rol. `PrivateRoute` recibe una prop `role` y redirige
-si el usuario no está autenticado o no tiene el rol requerido.
+Se usa **React Router 7 en Data mode** (`createBrowserRouter` + `RouterProvider`).
+Las rutas están separadas por rol en `src/routes/` y cada archivo exporta un array de route config objects.
+
+`PrivateRoute` actúa como layout route: redirige a `/login` si el usuario no está autenticado
+o no tiene el rol requerido, y renderiza `<Outlet />` si la sesión es válida.
 
 ```tsx
-<Routes>
-  {/* Públicas */}
-  <Route path="/" element={<Navigate to="/login" replace />} />
-  <Route path="/login" element={<LoginPage />} />
-  <Route path="/register" element={<RegisterPage />} />
-
-  {/* Alumno */}
-  <Route element={<PrivateRoute allowedRoles={[Role.ALUMNO]} />}>
-    <Route path="/alumno/dashboard" element={<AlumnoDashboardPage />} />
-    <Route path="/alumno/laboratorios" element={<LaboratoriosPage />} />
-    <Route path="/alumno/laboratorios/:id" element={<LaboratorioDetailPage />} />
-    <Route path="/alumno/proyecto/:id" element={<ProjectDetailPage />} />
-    <Route path="/alumno/postulaciones" element={<PostulacionesPage />} />
-  </Route>
-
-  {/* Responsable */}
-  <Route element={<PrivateRoute allowedRoles={[Role.RESPONSABLE_LABORATORIO]} />}>
-    <Route path="/responsable/dashboard" element={<ResponsableDashboardPage />} />
-    <Route path="/responsable/laboratorio" element={<LaboratorioPage />} />
-    <Route path="/responsable/proyectos/:id/postulaciones" element={<ProjectPostulacionesPage />} />
-  </Route>
-</Routes>
+// main.tsx
+const router = createBrowserRouter([
+  {
+    element: (
+      <AuthProvider>
+        <Toaster richColors position="top-right" />
+        <Outlet />
+      </AuthProvider>
+    ),
+    children: [...publicRoutes, ...alumnoRoutes, ...responsableRoutes],
+  },
+]);
 ```
+
+Cada archivo en `routes/` exporta un array:
+
+```ts
+// alumno-routes.tsx
+export const alumnoRoutes = [
+  {
+    element: <PrivateRoute allowedRoles={[Role.ALUMNO]} />,
+    children: [
+      { path: '/alumno/dashboard', element: <AlumnoDashboardPage /> },
+      { path: '/alumno/laboratorios', element: <LaboratoriosPage /> },
+      { path: '/alumno/laboratorios/:id', element: <LaboratorioDetailPage /> },
+      { path: '/alumno/proyecto/:id', element: <ProjectDetailPage /> },
+      { path: '/alumno/postulaciones', element: <PostulacionesPage /> },
+    ],
+  },
+];
+```
+
+Al agregar nuevas páginas de un rol, solo se edita el archivo de ese rol en `routes/`.
 
 ## Auth flow
 

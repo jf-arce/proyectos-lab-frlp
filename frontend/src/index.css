@@ -1,13 +1,16 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
+@import "@fontsource-variable/manrope";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Geist Variable', sans-serif;
+    --font-sans:    'Inter', sans-serif;
+    --font-display: 'Manrope Variable', sans-serif;
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -46,75 +49,124 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+
+    /* Sombras ambientales del proyecto */
+    --shadow-card:       0 2px 32px 0 oklch(0.26 0.07 252 / 0.05);
+    --shadow-card-hover: 0 4px 48px 0 oklch(0.26 0.07 252 / 0.08);
+    --shadow-nav:        0 1px 24px 0 oklch(0.26 0.07 252 / 0.06);
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+    /* Superficies */
+    --background:       oklch(0.98 0.003 247);   /* #f8f9fa — fondo de página */
+    --foreground:       oklch(0.16 0.010 247);   /* #191c1d — texto principal */
+    --card:             oklch(1 0 0);             /* #ffffff — cards elevadas */
+    --card-foreground:  oklch(0.16 0.010 247);
+    --popover:          oklch(1 0 0);
+    --popover-foreground: oklch(0.16 0.010 247);
+
+    /* Azul institucional UTN */
+    --primary:          oklch(0.26 0.070 252);   /* #00244b */
+    --primary-foreground: oklch(1 0 0);
+
+    /* Secundario y neutros */
+    --secondary:        oklch(0.94 0.004 247);   /* #ebedf0 */
+    --secondary-foreground: oklch(0.26 0.070 252);
+    --muted:            oklch(0.96 0.003 247);   /* #f3f4f5 */
+    --muted-foreground: oklch(0.52 0.007 247);   /* #6b7280 */
+    --accent:           oklch(0.94 0.004 247);
+    --accent-foreground: oklch(0.26 0.070 252);
+
+    /* Estados */
+    --destructive:      oklch(0.577 0.245 27.325);
+
+    /* Bordes */
+    --border:           oklch(0.90 0.005 247);
+    --input:            oklch(0.90 0.005 247);
+    --ring:             oklch(0.26 0.070 252);
+
+    /* New York: radio compacto */
+    --radius: 0.375rem;
+
+    /* Charts */
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
     --chart-3: oklch(0.439 0 0);
     --chart-4: oklch(0.371 0 0);
     --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
+
+    /* Sidebar */
+    --sidebar:                  oklch(0.985 0 0);
+    --sidebar-foreground:       oklch(0.145 0 0);
+    --sidebar-primary:          oklch(0.26 0.070 252);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent:           oklch(0.97 0 0);
     --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    --sidebar-border:           oklch(0.922 0 0);
+    --sidebar-ring:             oklch(0.708 0 0);
+
+    /* Tokens de estado de postulación */
+    --status-accepted-bg: oklch(0.94 0.07 145);
+    --status-accepted-fg: oklch(0.32 0.10 145);
+    --status-pending-bg:  oklch(0.96 0.07 85);
+    --status-pending-fg:  oklch(0.38 0.10 60);
+    --status-rejected-bg: oklch(0.95 0.05 27);
+    --status-rejected-fg: oklch(0.40 0.15 27);
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
+    /* Superficies — fondo con tinte azul institucional sutil */
+    --background:       oklch(0.13 0.015 252);
+    --foreground:       oklch(0.95 0.005 247);
+    --card:             oklch(0.18 0.012 252);
+    --card-foreground:  oklch(0.95 0.005 247);
+    --popover:          oklch(0.18 0.012 252);
+    --popover-foreground: oklch(0.95 0.005 247);
+
+    /* Azul institucional — más claro para ser legible sobre oscuro */
+    --primary:          oklch(0.65 0.12 252);
+    --primary-foreground: oklch(0.10 0.015 252);
+
+    /* Secundario y neutros */
+    --secondary:        oklch(0.22 0.012 252);
+    --secondary-foreground: oklch(0.90 0.005 247);
+    --muted:            oklch(0.20 0.010 252);
+    --muted-foreground: oklch(0.60 0.008 247);
+    --accent:           oklch(0.22 0.012 252);
+    --accent-foreground: oklch(0.90 0.005 247);
+
+    /* Estados */
+    --destructive:      oklch(0.704 0.191 22.216);
+
+    /* Bordes */
+    --border:           oklch(1 0 0 / 8%);
+    --input:            oklch(1 0 0 / 10%);
+    --ring:             oklch(0.65 0.12 252);
+
+    /* Charts */
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
     --chart-3: oklch(0.439 0 0);
     --chart-4: oklch(0.371 0 0);
     --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+
+    /* Sidebar — ligeramente más oscuro que card */
+    --sidebar:                  oklch(0.16 0.015 252);
+    --sidebar-foreground:       oklch(0.90 0.005 247);
+    --sidebar-primary:          oklch(0.65 0.12 252);
+    --sidebar-primary-foreground: oklch(0.10 0.015 252);
+    --sidebar-accent:           oklch(0.22 0.012 252);
+    --sidebar-accent-foreground: oklch(0.90 0.005 247);
+    --sidebar-border:           oklch(1 0 0 / 8%);
+    --sidebar-ring:             oklch(0.65 0.12 252);
+
+    /* Tokens de estado — invertidos: fondo oscuro, texto claro */
+    --status-accepted-bg: oklch(0.25 0.08 145);
+    --status-accepted-fg: oklch(0.82 0.12 145);
+    --status-pending-bg:  oklch(0.27 0.08 85);
+    --status-pending-fg:  oklch(0.85 0.10 85);
+    --status-rejected-bg: oklch(0.25 0.06 27);
+    --status-rejected-fg: oklch(0.82 0.12 27);
 }
 
 @layer base {
@@ -127,4 +179,21 @@
   html {
     @apply font-sans;
     }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    }
+}
+
+/* ── Clases de estado de postulación ── */
+.status-accepted {
+    background-color: var(--status-accepted-bg);
+    color:            var(--status-accepted-fg);
+}
+.status-pending {
+    background-color: var(--status-pending-bg);
+    color:            var(--status-pending-fg);
+}
+.status-rejected {
+    background-color: var(--status-rejected-bg);
+    color:            var(--status-rejected-fg);
 }

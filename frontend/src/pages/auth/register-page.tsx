@@ -1,214 +1,43 @@
-import { Link, useNavigate } from 'react-router';
-import { useForm } from 'react-hook-form';
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
-import { z } from 'zod';
-import { toast } from 'sonner';
-import { authService } from '@/services/auth';
-import { Role } from '@/types/auth';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-
-const schema = z.object({
-  nombre: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
-  apellido: z.string().min(2, 'El apellido debe tener al menos 2 caracteres'),
-  email: z.email('Ingresá un email válido'),
-  password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
-  legajo: z.string().min(1, 'El legajo es obligatorio'),
-  anioEnCurso: z.string().min(1, 'Seleccioná un año'),
-});
-
-type FormValues = z.infer<typeof schema>;
+import { FlaskConical, GraduationCap } from 'lucide-react';
+import { AuthBackground } from './components/auth-background';
+import { AuthBrandingPanel } from './components/auth-branding-panel';
+import { RegisterForm } from './components/register-form';
+import { AuthGridContainer } from './components/auth-grid-container';
 
 export function RegisterPage() {
-  const navigate = useNavigate();
-
-  const form = useForm<FormValues>({
-    resolver: standardSchemaResolver(schema),
-    mode: 'onChange',
-    defaultValues: {
-      nombre: '',
-      apellido: '',
-      email: '',
-      password: '',
-      legajo: '',
-      anioEnCurso: '',
-    },
-  });
-
-  async function onSubmit(values: FormValues) {
-    try {
-      await authService.register({
-        ...values,
-        rol: Role.ALUMNO,
-        anioEnCurso: Number(values.anioEnCurso),
-      });
-      toast.success('Cuenta creada correctamente. Ya podés iniciar sesión.');
-      navigate('/login', { replace: true });
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Error al registrarse');
-    }
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Crear cuenta</CardTitle>
-          <CardDescription>
-            Completá los datos para registrarte como alumno
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-2">
-                <FormField
-                  control={form.control}
-                  name="nombre"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nombre</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="apellido"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Apellido</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
+      <AuthBackground />
 
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" autoComplete="email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+      <AuthGridContainer>
+        <AuthBrandingPanel
+          patternId="register-grid"
+          title="Comenzá tu experiencia en los laboratorios"
+          description="Registrate para explorar proyectos de investigación y postularte a los que se ajusten a tu perfil."
+        >
+          <div className="flex items-center gap-3 text-sm font-medium">
+            <GraduationCap
+              className="size-5 text-primary-foreground/60"
+              strokeWidth={1.5}
+            />
+            <span>Solo para alumnos de UTN FRLP</span>
+          </div>
+          <div className="flex items-center gap-3 text-sm font-medium">
+            <FlaskConical
+              className="size-5 text-primary-foreground/60"
+              strokeWidth={1.5}
+            />
+            <span>Accedé a proyectos de laboratorio</span>
+          </div>
+          <div className="pt-6 border-t border-white/10">
+            <p className="text-xs text-primary-foreground/40 font-medium tracking-wide uppercase">
+              Universidad Tecnológica Nacional - Facultad Regional La Plata
+            </p>
+          </div>
+        </AuthBrandingPanel>
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Contraseña</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        autoComplete="new-password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-2 gap-2">
-                <FormField
-                  control={form.control}
-                  name="legajo"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Legajo</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="anioEnCurso"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Año en curso</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Año" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {[1, 2, 3, 4, 5].map((y) => (
-                            <SelectItem key={y} value={String(y)}>
-                              {y}° año
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={form.formState.isSubmitting}
-              >
-                {form.formState.isSubmitting
-                  ? 'Registrando...'
-                  : 'Crear cuenta'}
-              </Button>
-            </form>
-          </Form>
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            ¿Ya tenés cuenta?{' '}
-            <Link
-              to="/login"
-              className="underline underline-offset-4 hover:text-foreground"
-            >
-              Iniciá sesión
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
+        <RegisterForm />
+      </AuthGridContainer>
     </div>
   );
 }
