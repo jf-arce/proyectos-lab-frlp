@@ -34,7 +34,7 @@ Se creó un `AuthProvider` en `src/context/auth-context.tsx` que expone:
 }
 ```
 
-`AuthProvider` vive en `main.tsx`, envolviendo toda la app.
+`AuthProvider` vive en `main.tsx` como elemento de un route raíz en `createBrowserRouter`, envolviendo toda la app mediante `<Outlet />`.
 
 **Por qué `login` retorna `JwtPayload`:**  
 React actualiza el estado de forma asíncrona. Si el componente de login lee `user` del contexto inmediatamente después de llamar a `login()`, el valor todavía es `null` porque el re-render aún no ocurrió. Para navegar según el rol sin esperar el ciclo de render, `login()` retorna el payload decodificado directamente.
@@ -64,11 +64,14 @@ OK                     → <Outlet />
 
 Mientras `isLoading` es `true` (restaurando sesión), renderiza `null` para evitar un flash de redirección al login antes de que el refresh termine.
 
-Uso en routing:
-```tsx
-<Route element={<PrivateRoute allowedRoles={['ALUMNO']} />}>
-  <Route path="/alumno/labs" element={<LabsPage />} />
-</Route>
+Uso en routing (Data mode — config objects):
+```ts
+{
+  element: <PrivateRoute allowedRoles={[Role.ALUMNO]} />,
+  children: [
+    { path: '/alumno/labs', element: <LabsPage /> },
+  ],
+}
 ```
 
 ### 5. Estructura de archivos
