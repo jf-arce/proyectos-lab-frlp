@@ -126,7 +126,7 @@ export function LoginPage() {
               Bienvenido
             </h2>
             <p className="text-muted-foreground font-medium">
-              Ingresá tus credenciales institucionales
+              Ingresá tus credenciales
             </p>
           </div>
 
