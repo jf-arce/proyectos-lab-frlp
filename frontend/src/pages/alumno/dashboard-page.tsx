@@ -37,13 +37,6 @@ import {
 import { useAuth } from '@/hooks/use-auth';
 import { Search } from 'lucide-react';
 
-// ── Helpers ───────────────────────────────────────────────
-function getDisplayName(email: string): string {
-  const localPart = email.split('@')[0];
-  const namePart = localPart.split('.')[0];
-  return namePart.charAt(0).toUpperCase() + namePart.slice(1);
-}
-
 // ── Datos de muestra ──────────────────────────────────────
 const recommendedProjects = [
   {
@@ -120,7 +113,7 @@ const exploreProjects = [
 // ── Componente principal ──────────────────────────────────
 export function AlumnoDashboardPage() {
   const { user } = useAuth();
-  const displayName = user ? getDisplayName(user.email) : 'Alumno';
+  const displayName = user?.nombre ?? 'Alumno';
 
   return (
     <div className="space-y-10">
@@ -145,7 +138,7 @@ export function AlumnoDashboardPage() {
               </Button>
               <Button
                 variant="outline"
-                className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                className="border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/20 hover:border-primary-foreground/60 hover:text-primary-foreground"
               >
                 Guía del Alumno
               </Button>
@@ -287,7 +280,7 @@ export function AlumnoDashboardPage() {
               >
                 <div className={`h-28 relative overflow-hidden bg-primary`}>
                   <div
-                    className={`absolute inset-0 bg-gradient-to-br ${project.gradient}`}
+                    className={`absolute inset-0 bg-linear-to-br ${project.gradient}`}
                   />
                   <div className="absolute bottom-3 left-4">
                     <span className="text-primary-foreground/60 text-[10px] font-bold uppercase tracking-widest">
@@ -339,7 +332,7 @@ export function AlumnoDashboardPage() {
 
                   <Button
                     variant="outline"
-                    className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors"
+                    className="w-full hover:bg-primary hover:text-primary-foreground hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors"
                   >
                     Ver Detalles
                   </Button>

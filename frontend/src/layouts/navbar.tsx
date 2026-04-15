@@ -13,14 +13,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
 
-function getInitials(email: string): string {
-  const parts = email.split('@')[0].split('.');
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[1][0]).toUpperCase();
-  }
-  return email.slice(0, 2).toUpperCase();
-}
-
 const navLinks = [
   { to: '/alumno/dashboard', label: 'Inicio' },
   { to: '/alumno/laboratorios', label: 'Laboratorios' },
@@ -29,7 +21,9 @@ const navLinks = [
 
 export function Navbar() {
   const { user, logout } = useAuth();
-  const initials = user ? getInitials(user.email) : '?';
+  const initials = user
+    ? (user.nombre[0] + user.apellido[0]).toUpperCase()
+    : '?';
 
   return (
     <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-sm shadow-nav border-b border-border/40">
