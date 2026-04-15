@@ -85,10 +85,17 @@ export function LoginPage() {
 
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-12">
-              <Landmark className="size-8" strokeWidth={1.5} />
+              {/* <Landmark className="size-8" strokeWidth={1.5} />
               <span className="text-xl font-extrabold tracking-tighter uppercase font-display">
                 UTN FRLP
-              </span>
+              </span> */}
+              <picture>
+                <img
+                  src="/images/utn-logo.png"
+                  alt="Logo de UTN FRLP"
+                  className="h-10 w-auto invert dark:invert-0"
+                />
+              </picture>
             </div>
             <h1 className="text-4xl font-extrabold leading-tight tracking-tight mb-6 font-display">
               Gestión de Proyectos y Laboratorios
