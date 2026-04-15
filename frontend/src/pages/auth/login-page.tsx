@@ -85,10 +85,6 @@ export function LoginPage() {
 
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-12">
-              {/* <Landmark className="size-8" strokeWidth={1.5} />
-              <span className="text-xl font-extrabold tracking-tighter uppercase font-display">
-                UTN FRLP
-              </span> */}
               <picture>
                 <img
                   src="/images/utn-logo.png"
@@ -100,7 +96,7 @@ export function LoginPage() {
             <h1 className="text-4xl font-extrabold leading-tight tracking-tight mb-6 font-display">
               Gestión de Proyectos y Laboratorios
             </h1>
-            <p className="text-primary-foreground/70 text-lg font-medium max-w-sm leading-relaxed">
+            <p className="text-primary-foreground/70 text-md font-medium max-w-sm leading-relaxed">
               Acceso exclusivo para docentes, investigadores y alumnos de la
               Facultad Regional La Plata.
             </p>
@@ -109,7 +105,7 @@ export function LoginPage() {
           <div className="relative z-10 flex flex-col gap-4">
             <div className="pt-6 border-t border-white/10">
               <p className="text-xs text-primary-foreground/40 font-medium tracking-wide uppercase">
-                Universidad Tecnológica Nacional
+                Universidad Tecnológica Nacional - Facultad Regional La Plata
               </p>
             </div>
           </div>

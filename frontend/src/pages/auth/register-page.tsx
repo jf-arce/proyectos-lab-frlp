@@ -99,15 +99,18 @@ export function RegisterPage() {
 
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-12">
-              <Landmark className="size-8" strokeWidth={1.5} />
-              <span className="text-xl font-extrabold tracking-tighter uppercase font-display">
-                UTN FRLP
-              </span>
+              <picture>
+                <img
+                  src="/images/utn-logo.png"
+                  alt="Logo de UTN FRLP"
+                  className="h-10 w-auto invert dark:invert-0"
+                />
+              </picture>
             </div>
             <h1 className="text-4xl font-extrabold leading-tight tracking-tight mb-6 font-display">
               Comenzá tu experiencia en los laboratorios
             </h1>
-            <p className="text-primary-foreground/70 text-lg font-medium max-w-sm leading-relaxed">
+            <p className="text-primary-foreground/70 text-md font-medium max-w-sm leading-relaxed">
               Registrate para explorar proyectos de investigación y postularte a
               los que se ajusten a tu perfil.
             </p>
@@ -130,7 +133,7 @@ export function RegisterPage() {
             </div>
             <div className="pt-6 border-t border-white/10">
               <p className="text-xs text-primary-foreground/40 font-medium tracking-wide uppercase">
-                Universidad Tecnológica Nacional
+                Universidad Tecnológica Nacional - Facultad Regional La Plata
               </p>
             </div>
           </div>
