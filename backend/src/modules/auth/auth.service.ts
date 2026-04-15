@@ -59,8 +59,8 @@ export class AuthService {
         await this.alumnoService.create(
           user.id,
           {
-            nombre: dto.nombre!,
-            apellido: dto.apellido!,
+            nombre: dto.nombre,
+            apellido: dto.apellido,
             legajo: dto.legajo!,
             anioEnCurso: dto.anioEnCurso!,
           },
@@ -80,8 +80,8 @@ export class AuthService {
         await this.responsableService.create(
           user.id,
           {
-            nombre: dto.nombre!,
-            apellido: dto.apellido!,
+            nombre: dto.nombre,
+            apellido: dto.apellido,
             laboratorioId: dto.laboratorioId!,
           },
           queryRunner.manager,
@@ -95,6 +95,8 @@ export class AuthService {
         user.id,
         user.email,
         user.rol,
+        dto.nombre,
+        dto.apellido,
         laboratorioId,
       );
       return { accessToken };
@@ -120,10 +122,16 @@ export class AuthService {
     }
 
     const laboratorioId = await this.getLaboratorioId(user.id, user.rol);
+    const { nombre, apellido } = await this.getNombreApellido(
+      user.id,
+      user.rol,
+    );
     const accessToken = this.signAccessToken(
       user.id,
       user.email,
       user.rol,
+      nombre,
+      apellido,
       laboratorioId,
     );
     const refreshToken = await this.generateAndStoreRefreshToken(user.id);
@@ -145,10 +153,16 @@ export class AuthService {
             candidate.user.id,
             candidate.user.rol,
           );
+          const { nombre, apellido } = await this.getNombreApellido(
+            candidate.user.id,
+            candidate.user.rol,
+          );
           const accessToken = this.signAccessToken(
             candidate.user.id,
             candidate.user.email,
             candidate.user.rol,
+            nombre,
+            apellido,
             laboratorioId,
           );
           return { accessToken };
@@ -190,15 +204,31 @@ export class AuthService {
     userId: string,
     email: string,
     role: UserRole,
+    nombre: string,
+    apellido: string,
     laboratorioId?: string,
   ): string {
     const payload = {
       sub: userId,
       email,
       role,
+      nombre,
+      apellido,
       ...(laboratorioId && { laboratorioId }),
     };
     return this.jwtService.sign(payload);
+  }
+
+  private async getNombreApellido(
+    userId: string,
+    rol: UserRole,
+  ): Promise<{ nombre: string; apellido: string }> {
+    if (rol === UserRole.ALUMNO) {
+      const alumno = await this.alumnoService.findByUserId(userId);
+      return { nombre: alumno.nombre, apellido: alumno.apellido };
+    }
+    const responsable = await this.responsableService.findByUsuarioId(userId);
+    return { nombre: responsable!.nombre, apellido: responsable!.apellido };
   }
 
   private async generateAndStoreRefreshToken(userId: string): Promise<string> {
