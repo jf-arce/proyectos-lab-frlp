@@ -3,11 +3,12 @@ import { useForm } from 'react-hook-form';
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { FlaskConical, GraduationCap, Landmark, UserPlus } from 'lucide-react';
+import { FlaskConical, GraduationCap, UserPlus } from 'lucide-react';
 import { authService } from '@/services/auth';
 import { Role } from '@/types/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import {
   Form,
   FormControl,
@@ -143,10 +144,13 @@ export function RegisterPage() {
         <div className="p-8 md:p-12 flex flex-col justify-center">
           {/* Logo mobile */}
           <div className="md:hidden flex items-center justify-center gap-2 mb-8">
-            <Landmark className="size-6 text-primary" strokeWidth={1.5} />
-            <span className="text-lg font-extrabold tracking-tighter text-primary font-display">
-              UTN FRLP
-            </span>
+            <picture>
+              <img
+                src="/images/utn-logo.png"
+                alt="Logo de UTN FRLP"
+                className="h-10 w-auto invert-0 dark:invert"
+              />
+            </picture>
           </div>
 
           <div className="mb-8 text-center md:text-left">
@@ -223,8 +227,7 @@ export function RegisterPage() {
                   <FormItem>
                     <FormLabel>Contraseña</FormLabel>
                     <FormControl>
-                      <Input
-                        type="password"
+                      <PasswordInput
                         autoComplete="new-password"
                         placeholder="Mínimo 8 caracteres"
                         {...field}

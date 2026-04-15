@@ -3,11 +3,12 @@ import { useForm } from 'react-hook-form';
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { Landmark, LogIn, UserPlus } from 'lucide-react';
+import { LogIn, UserPlus } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Role } from '@/types/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import {
   Form,
   FormControl,
@@ -115,10 +116,13 @@ export function LoginPage() {
         <div className="p-8 md:p-14 flex flex-col justify-center">
           {/* Logo mobile */}
           <div className="md:hidden flex items-center justify-center gap-2 mb-10">
-            <Landmark className="size-6 text-primary" strokeWidth={1.5} />
-            <span className="text-lg font-extrabold tracking-tighter text-primary font-display">
-              UTN FRLP
-            </span>
+            <picture>
+              <img
+                src="/images/utn-logo.png"
+                alt="Logo de UTN FRLP"
+                className="h-10 w-auto invert-0 dark:invert"
+              />
+            </picture>
           </div>
 
           <div className="mb-10 text-center md:text-left">
@@ -166,8 +170,7 @@ export function LoginPage() {
                       </a>
                     </div>
                     <FormControl>
-                      <Input
-                        type="password"
+                      <PasswordInput
                         autoComplete="current-password"
                         placeholder="••••••••"
                         {...field}
