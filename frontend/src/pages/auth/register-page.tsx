@@ -3,17 +3,11 @@ import { useForm } from 'react-hook-form';
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import { FlaskConical, GraduationCap, Landmark, UserPlus } from 'lucide-react';
 import { authService } from '@/services/auth';
 import { Role } from '@/types/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -72,18 +66,98 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Crear cuenta</CardTitle>
-          <CardDescription>
-            Completá los datos para registrarte como alumno
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Blobs atmosféricos de fondo */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-5%] w-[40vw] h-[40vw] rounded-full bg-primary/8 blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[30vw] h-[30vw] rounded-full bg-primary/5 blur-[100px]" />
+      </div>
+
+      <div className="w-full max-w-4xl grid md:grid-cols-2 bg-card rounded-xl shadow-[0_32px_64px_-12px_rgba(0,36,75,0.08)] overflow-hidden z-10">
+        {/* ── Panel de branding ── */}
+        <div className="hidden md:flex flex-col justify-between p-12 bg-primary text-primary-foreground relative overflow-hidden">
+          <div className="absolute inset-0 opacity-5 pointer-events-none">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern
+                  id="register-grid"
+                  width="40"
+                  height="40"
+                  patternUnits="userSpaceOnUse"
+                >
+                  <path
+                    d="M 40 0 L 0 0 0 40"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="0.5"
+                  />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#register-grid)" />
+            </svg>
+          </div>
+
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-12">
+              <Landmark className="size-8" strokeWidth={1.5} />
+              <span className="text-xl font-extrabold tracking-tighter uppercase font-display">
+                UTN FRLP
+              </span>
+            </div>
+            <h1 className="text-4xl font-extrabold leading-tight tracking-tight mb-6 font-display">
+              Comenzá tu experiencia en los laboratorios
+            </h1>
+            <p className="text-primary-foreground/70 text-lg font-medium max-w-sm leading-relaxed">
+              Registrate para explorar proyectos de investigación y postularte a
+              los que se ajusten a tu perfil.
+            </p>
+          </div>
+
+          <div className="relative z-10 flex flex-col gap-4">
+            <div className="flex items-center gap-3 text-sm font-medium">
+              <GraduationCap
+                className="size-5 text-primary-foreground/60"
+                strokeWidth={1.5}
+              />
+              <span>Solo para alumnos de UTN FRLP</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm font-medium">
+              <FlaskConical
+                className="size-5 text-primary-foreground/60"
+                strokeWidth={1.5}
+              />
+              <span>Accedé a proyectos de laboratorio</span>
+            </div>
+            <div className="pt-6 border-t border-white/10">
+              <p className="text-xs text-primary-foreground/40 font-medium tracking-wide uppercase">
+                Universidad Tecnológica Nacional
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Panel de formulario ── */}
+        <div className="p-8 md:p-12 flex flex-col justify-center">
+          {/* Logo mobile */}
+          <div className="md:hidden flex items-center justify-center gap-2 mb-8">
+            <Landmark className="size-6 text-primary" strokeWidth={1.5} />
+            <span className="text-lg font-extrabold tracking-tighter text-primary font-display">
+              UTN FRLP
+            </span>
+          </div>
+
+          <div className="mb-8 text-center md:text-left">
+            <h2 className="text-3xl font-extrabold text-primary mb-2 font-display">
+              Crear cuenta
+            </h2>
+            <p className="text-muted-foreground font-medium">
+              Completá tus datos para registrarte como alumno
+            </p>
+          </div>
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 <FormField
                   control={form.control}
                   name="nombre"
@@ -91,7 +165,11 @@ export function RegisterPage() {
                     <FormItem>
                       <FormLabel>Nombre</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input
+                          autoComplete="given-name"
+                          placeholder="Juan"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -104,7 +182,11 @@ export function RegisterPage() {
                     <FormItem>
                       <FormLabel>Apellido</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input
+                          autoComplete="family-name"
+                          placeholder="García"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -119,7 +201,12 @@ export function RegisterPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" autoComplete="email" {...field} />
+                      <Input
+                        type="email"
+                        autoComplete="email"
+                        placeholder="usuario@email.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -136,6 +223,7 @@ export function RegisterPage() {
                       <Input
                         type="password"
                         autoComplete="new-password"
+                        placeholder="Mínimo 8 caracteres"
                         {...field}
                       />
                     </FormControl>
@@ -144,7 +232,7 @@ export function RegisterPage() {
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 <FormField
                   control={form.control}
                   name="legajo"
@@ -152,7 +240,7 @@ export function RegisterPage() {
                     <FormItem>
                       <FormLabel>Legajo</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input placeholder="60000" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -170,7 +258,7 @@ export function RegisterPage() {
                       >
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Año" />
+                            <SelectValue placeholder="Seleccioná" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -189,26 +277,28 @@ export function RegisterPage() {
 
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full py-6"
                 disabled={form.formState.isSubmitting}
               >
                 {form.formState.isSubmitting
-                  ? 'Registrando...'
+                  ? 'Creando cuenta...'
                   : 'Crear cuenta'}
+                <UserPlus className="size-4" />
               </Button>
             </form>
           </Form>
-          <p className="mt-4 text-center text-sm text-muted-foreground">
+
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             ¿Ya tenés cuenta?{' '}
             <Link
               to="/login"
-              className="underline underline-offset-4 hover:text-foreground"
+              className="font-medium text-primary hover:underline underline-offset-4"
             >
               Iniciá sesión
             </Link>
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
