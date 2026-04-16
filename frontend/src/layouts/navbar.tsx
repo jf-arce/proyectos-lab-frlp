@@ -67,7 +67,12 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="relative p-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative p-4"
+            press={false}
+          >
             <Bell />
             <span className="absolute top-2 right-2 size-1.5 rounded-full bg-primary" />
           </Button>

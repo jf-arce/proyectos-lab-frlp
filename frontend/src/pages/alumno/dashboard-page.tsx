@@ -130,15 +130,12 @@ export function AlumnoDashboardPage() {
               investigación y desarrollo.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Button
-                asChild
-                className="bg-card text-primary hover:bg-card/90 shadow-sm"
-              >
+              <Button asChild className="h-10" variant="secondary">
                 <Link to="/alumno/postulaciones">Ver mis aplicaciones</Link>
               </Button>
               <Button
                 variant="outline"
-                className="border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/20 hover:border-primary-foreground/60 hover:text-primary-foreground"
+                className="h-10 text-background bg-transparent hover:text-background hover:bg-transparent dark:text-background dark:border-background"
               >
                 Guía del Alumno
               </Button>
