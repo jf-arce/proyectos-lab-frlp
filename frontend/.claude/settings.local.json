@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npx shadcn:*)",
       "Bash(npx tsc:*)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Skill(shadcn)"
     ]
   }
 }

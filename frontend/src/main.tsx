@@ -1,3 +1,4 @@
+import { ThemeProvider } from '@/components/theme-provider';
 import { createRoot } from 'react-dom/client';
 import { Outlet, RouterProvider, createBrowserRouter } from 'react-router';
 import { Toaster } from 'sonner';
@@ -11,7 +12,7 @@ const router = createBrowserRouter([
   {
     element: (
       <AuthProvider>
-        <Toaster richColors position="top-right" />
+        <Toaster richColors position="bottom-right" />
         <Outlet />
       </AuthProvider>
     ),
@@ -20,5 +21,7 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById('root')!).render(
-  <RouterProvider router={router} />,
+  <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <RouterProvider router={router} />
+  </ThemeProvider>,
 );

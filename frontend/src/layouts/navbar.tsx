@@ -1,4 +1,4 @@
-import { Bell, ChevronDown } from 'lucide-react';
+import { Bell, ChevronDown, Moon, Sun } from 'lucide-react';
 import { NavLink } from 'react-router';
 import { Button } from '@/components/ui/button';
 import {
@@ -6,11 +6,17 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
+import { useTheme } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
 
 const navLinks = [
@@ -21,6 +27,7 @@ const navLinks = [
 
 export function Navbar() {
   const { user, logout } = useAuth();
+  const { resolvedTheme, setTheme } = useTheme();
   const initials = user
     ? (user.nombre[0] + user.apellido[0]).toUpperCase()
     : '?';
@@ -28,20 +35,18 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-sm shadow-nav border-b border-border/40">
       <div className="container mx-auto flex h-14 items-center justify-between px-4 md:px-6 max-w-5xl">
-        {/* Logo + navegación */}
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2.5">
-            <div className="size-7 rounded-md bg-primary flex items-center justify-center shrink-0">
-              <span className="text-primary-foreground text-xs font-bold font-display">
-                U
-              </span>
-            </div>
-            <span className="font-display font-semibold text-sm hidden sm:block">
-              Portal FRLP
-            </span>
+            <picture>
+              <img
+                src="/images/utn-logo.png"
+                alt="Logo de UTN FRLP"
+                className="h-8 w-auto dark:invert invert-0"
+              />
+            </picture>
           </div>
 
-          <nav className="hidden md:flex items-center gap-0.5">
+          <nav className="hidden md:flex items-center gap-1">
             {navLinks.map(({ to, label }) => (
               <NavLink
                 key={to}
@@ -61,16 +66,15 @@ export function Navbar() {
           </nav>
         </div>
 
-        {/* Acciones */}
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="relative">
+          <Button variant="ghost" size="icon" className="relative p-4">
             <Bell />
             <span className="absolute top-2 right-2 size-1.5 rounded-full bg-primary" />
           </Button>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-1.5 px-2">
+              <Button variant="ghost" size="sm" className="gap-1.5 px-2 py-4">
                 <Avatar size="sm">
                   <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
@@ -82,6 +86,32 @@ export function Navbar() {
                 <DropdownMenuItem>Mi perfil</DropdownMenuItem>
                 <DropdownMenuItem>Mis postulaciones</DropdownMenuItem>
               </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  {resolvedTheme === 'dark' ? (
+                    <Moon key="moon" className="mr-2 size-4" />
+                  ) : (
+                    <Sun key="sun" className="mr-2 size-4" />
+                  )}
+                  Tema
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuRadioGroup
+                    value={resolvedTheme}
+                    onValueChange={setTheme}
+                  >
+                    <DropdownMenuRadioItem value="light">
+                      <Sun className="mr-2 size-4" />
+                      Claro
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="dark">
+                      <Moon className="mr-2 size-4" />
+                      Oscuro
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
               <DropdownMenuSeparator />
               <DropdownMenuItem variant="destructive" onClick={logout}>
                 Cerrar sesión
