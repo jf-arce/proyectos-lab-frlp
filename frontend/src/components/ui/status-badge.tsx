@@ -6,7 +6,10 @@ const config: Record<Status, { label: string; className: string }> = {
   pending: { label: 'Pendiente', className: 'status-pending' },
   accepted: { label: 'Aceptado', className: 'status-accepted' },
   rejected: { label: 'Rechazado', className: 'status-rejected' },
-  active: { label: 'Activo', className: 'bg-primary/10 text-primary' },
+  active: {
+    label: 'Activo',
+    className: 'bg-green-500/60 dark:bg-green-300 text-background',
+  },
   closed: { label: 'Cerrado', className: 'bg-muted text-muted-foreground' },
 };
 

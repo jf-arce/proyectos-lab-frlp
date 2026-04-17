@@ -19,7 +19,7 @@ export function SkillTag({
     <span
       className={cn(
         'inline-flex items-center gap-1 rounded-full',
-        'bg-secondary text-secondary-foreground px-2.5 py-0.5 text-xs font-medium',
+        'bg-primary/40 text-primary-foreground dark:text-foreground px-2.5 py-0.5 text-xs font-medium',
         className,
       )}
     >
