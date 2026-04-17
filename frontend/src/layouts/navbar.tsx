@@ -74,12 +74,16 @@ export function Navbar() {
             press={false}
           >
             <Bell />
-            <span className="absolute top-2 right-2 size-1.5 rounded-full bg-primary" />
+            <span className="absolute top-2 right-2 size-1.5 rounded-full bg-red-500" />
           </Button>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-1.5 px-2 py-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 px-2 py-4 focus-visible:ring-0"
+              >
                 <Avatar size="sm">
                   <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
