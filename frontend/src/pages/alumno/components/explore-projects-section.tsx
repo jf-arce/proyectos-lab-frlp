@@ -1,58 +1,99 @@
-import { ChevronRight, Search } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { SkillTag } from '@/components/ui/skill-tag';
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from '@/components/ui/input-group';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  ProjectCardExplore,
-  type ExploreProject,
-} from './project-card-explore';
+import { useAuth } from '@/hooks/use-auth';
+import { useProjectFilters } from '@/hooks/use-project-filters';
+import { projectsService } from '@/services/projects';
+import type { ExploreProject } from '@/types/projects';
+import { ProjectCardExplore } from './project-card-explore';
+import { ProjectFiltersBar } from './project-filters-bar';
 
-const exploreProjects: ExploreProject[] = [
-  {
-    id: 101,
-    titulo: 'Sensores de Fibra Óptica en Estructuras Civiles',
-    descripcion:
-      'Monitoreo estructural en tiempo real usando redes de sensores distribuidos de baja potencia.',
-    laboratorio: { nombre: 'Laboratorio de Ensayos (LABEN)' },
-    skills: [{ nombre: 'MATLAB' }, { nombre: 'IoT' }],
-    estado: 'ACTIVO',
-    created_at: new Date(Date.now()).toISOString(),
-  },
-  {
-    id: 102,
-    titulo: 'Análisis de Estabilidad en Taludes Críticos',
-    descripcion:
-      'Modelado geotécnico con métodos numéricos para evaluar riesgo de falla en taludes naturales.',
-    laboratorio: { nombre: 'Grupo de Geotecnia' },
-    skills: [{ nombre: 'Python' }, { nombre: 'Geodesia' }],
-    estado: 'ACTIVO',
-    created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
-  },
-  {
-    id: 103,
-    titulo: 'Control Automático de Brazo Robótico Quirúrgico',
-    descripcion:
-      'Diseño de controladores PID y fuzzy para manipuladores con restricciones de seguridad crítica.',
-    laboratorio: { nombre: 'Centro de Bioingeniería' },
-    skills: [{ nombre: 'C++' }, { nombre: 'ROS' }, { nombre: 'OpenCV' }],
-    estado: 'ACTIVO',
-    created_at: new Date(Date.now() - 14 * 86400000).toISOString(),
-  },
-];
+const PAGE_SIZE = 4;
 
 export function ExploreProjectsSection() {
+  const { token } = useAuth();
+
+  const [projects, setProjects] = useState<ExploreProject[]>([]);
+  const [total, setTotal] = useState(0);
+  const [isLoading, setIsLoading] = useState(!!token);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [labOptions, setLabOptions] = useState<string[]>([]);
+  const [skillOptions, setSkillOptions] = useState<string[]>([]);
+  const [optionsLoaded, setOptionsLoaded] = useState(false);
+
+  const {
+    searchQuery,
+    selectedLab,
+    selectedSkills,
+    debouncedQuery,
+    handleSearchChange,
+    handleLabChange,
+    setSkills,
+  } = useProjectFilters(() => setIsLoading(true));
+
+  // Carga inicial y al cambiar filtros — reemplaza resultados
+  useEffect(() => {
+    if (!token) return;
+
+    projectsService
+      .findAll(token, {
+        q: debouncedQuery,
+        lab: selectedLab,
+        skills: selectedSkills,
+        limit: PAGE_SIZE,
+        offset: 0,
+      })
+      .then(({ data, total }) => {
+        setProjects(data);
+        setTotal(total);
+        setError(null);
+        if (!optionsLoaded) {
+          setLabOptions(
+            Array.from(new Set(data.map((p) => p.laboratorio.nombre))).sort(),
+          );
+          setSkillOptions(
+            Array.from(
+              new Set(data.flatMap((p) => p.skills.map((s) => s.nombre))),
+            ).sort(),
+          );
+          setOptionsLoaded(true);
+        }
+      })
+      .catch((err: unknown) => {
+        setError(
+          err instanceof Error ? err.message : 'Error al cargar proyectos',
+        );
+      })
+      .finally(() => setIsLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, debouncedQuery, selectedLab, selectedSkills.join(',')]);
+
+  function handleLoadMore() {
+    if (!token) return;
+    setIsLoadingMore(true);
+    projectsService
+      .findAll(token, {
+        q: debouncedQuery,
+        lab: selectedLab,
+        skills: selectedSkills,
+        limit: PAGE_SIZE,
+        offset: projects.length,
+      })
+      .then(({ data, total }) => {
+        setProjects((prev) => [...prev, ...data]);
+        setTotal(total);
+      })
+      .catch((err: unknown) => {
+        setError(
+          err instanceof Error ? err.message : 'Error al cargar proyectos',
+        );
+      })
+      .finally(() => setIsLoadingMore(false));
+  }
+
+  const hasMore = projects.length < total;
+
   return (
     <section>
       <div className="rounded-2xl p-6 bg-card/60 border border-input">
@@ -60,69 +101,58 @@ export function ExploreProjectsSection() {
           Explorar Proyectos
         </h2>
 
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8">
-          <div className="flex-1 max-w-xl">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                Buscar por palabras clave
-              </label>
-              <InputGroup>
-                <InputGroupAddon>
-                  <Search />
-                </InputGroupAddon>
-                <InputGroupInput placeholder="IA, Python, Electrónica..." />
-              </InputGroup>
-            </div>
+        <ProjectFiltersBar
+          searchQuery={searchQuery}
+          selectedLab={selectedLab}
+          selectedSkills={selectedSkills}
+          labOptions={labOptions}
+          skillOptions={skillOptions}
+          onSearchChange={handleSearchChange}
+          onLabChange={handleLabChange}
+          onSkillsChange={setSkills}
+        />
+
+        {isLoading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+              <div key={i} className="h-64 rounded-xl bg-muted animate-pulse" />
+            ))}
           </div>
+        )}
 
-          <div className="flex flex-wrap gap-4">
-            <div className="min-w-45 space-y-1.5">
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                Laboratorio
-              </label>
-              <Select>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Todos los labs" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="all">Todos los labs</SelectItem>
-                    <SelectItem value="lidic">LIDIC</SelectItem>
-                    <SelectItem value="gese">GESE</SelectItem>
-                    <SelectItem value="cit">CIT</SelectItem>
-                    <SelectItem value="laben">LABEN</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+        {!isLoading && error && (
+          <p className="text-sm text-destructive text-center py-8">{error}</p>
+        )}
+
+        {!isLoading && !error && projects.length === 0 && (
+          <p className="text-sm text-muted-foreground text-center py-8">
+            {!optionsLoaded
+              ? 'No hay proyectos activos por el momento.'
+              : 'Ningún proyecto coincide con los filtros aplicados.'}
+          </p>
+        )}
+
+        {!isLoading && !error && projects.length > 0 && (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {projects.map((project) => (
+                <ProjectCardExplore key={project.id} project={project} />
+              ))}
             </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                Habilidades
-              </label>
-              <div className="flex flex-wrap gap-1.5 items-center bg-muted rounded-lg px-3 py-2 min-h-10 min-w-50">
-                <SkillTag removable>Python</SkillTag>
-                <SkillTag removable>C++</SkillTag>
-                <span className="text-muted-foreground text-xs cursor-pointer hover:text-foreground transition-colors">
-                  + Añadir
-                </span>
+            {hasMore && (
+              <div className="flex justify-center mt-6">
+                <Button
+                  variant="ghost"
+                  className="px-4 h-10"
+                  onClick={handleLoadMore}
+                  disabled={isLoadingMore}
+                >
+                  {isLoadingMore ? 'Cargando...' : 'Mostrar más proyectos'}
+                </Button>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
-          {exploreProjects.map((project) => (
-            <ProjectCardExplore key={project.id} project={project} />
-          ))}
-        </div>
-
-        <div className="mt-10 flex justify-center">
-          <Button variant="ghost" className="gap-2 h-10 px-4 font-semibold">
-            Cargar más proyectos
-            <ChevronRight />
-          </Button>
-        </div>
+            )}
+          </>
+        )}
       </div>
     </section>
   );

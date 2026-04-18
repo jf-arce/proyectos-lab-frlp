@@ -18,7 +18,6 @@ const recommendedProjects: RecommendedProject[] = [
       { nombre: 'CUDA', categoria: 'Hardware' },
     ],
     match: 92,
-    estado: 'ACTIVO',
   },
   {
     id: 2,
@@ -31,7 +30,6 @@ const recommendedProjects: RecommendedProject[] = [
       { nombre: 'Simulink', categoria: 'Herramienta' },
     ],
     match: 85,
-    estado: 'ACTIVO',
   },
   {
     id: 3,
@@ -45,7 +43,6 @@ const recommendedProjects: RecommendedProject[] = [
       { nombre: 'PostgreSQL', categoria: 'Base de datos' },
     ],
     match: 78,
-    estado: 'ACTIVO',
   },
 ];
 

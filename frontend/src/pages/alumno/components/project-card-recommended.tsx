@@ -9,7 +9,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SkillTag } from '@/components/ui/skill-tag';
-import { StatusBadge } from '@/components/ui/status-badge';
 
 export interface RecommendedProject {
   id: number;
@@ -18,7 +17,6 @@ export interface RecommendedProject {
   laboratorio: { nombre: string };
   skills: { nombre: string; categoria?: string }[];
   match: number;
-  estado: 'ACTIVO' | 'CERRADO';
 }
 
 export function ProjectCardRecommended({
@@ -32,9 +30,6 @@ export function ProjectCardRecommended({
     <Card className="px-1 py-5 flex flex-col shadow-card hover:shadow-card-hover transition-shadow duration-200">
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2 mb-2">
-          <StatusBadge
-            status={project.estado === 'ACTIVO' ? 'active' : 'closed'}
-          />
           <Badge
             variant="outline"
             className="font-semibold text-primary border-primary/30 shrink-0"
