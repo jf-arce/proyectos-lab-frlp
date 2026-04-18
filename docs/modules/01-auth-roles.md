@@ -23,7 +23,7 @@ Los dos roles del sistema son:
 
 - Endpoint `POST /auth/login` que acepta `email` y `password`.
 - Verificar que el usuario existe y que el hash coincide.
-- Emitir un **access token JWT** firmado que incluya en el payload: `sub` (userId), `email`, `role` y, si aplica, `laboratoryId`. Vida corta (`15m`).
+- Emitir un **access token JWT** firmado que incluya en el payload: `sub` (userId), `email`, `role`, `nombre`, `apellido` y, si aplica, `laboratoryId`. Vida corta (`15m`).
 - Emitir también un **refresh token** opaco (random de 32 bytes), hasheado con bcrypt y persistido en DB con fecha de expiración (`7d`). Se usa para renovar el access token sin requerir login.
 - Endpoint `POST /auth/refresh` que recibe el refresh token, lo valida contra DB y emite un nuevo access token.
 - Endpoint `POST /auth/logout` que invalida el refresh token en DB.

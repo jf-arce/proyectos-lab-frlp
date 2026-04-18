@@ -66,7 +66,7 @@
     --popover-foreground: oklch(0.16 0.010 247);
 
     /* Azul institucional UTN */
-    --primary:          oklch(0.26 0.070 252);   /* #00244b */
+    --primary:          oklch(39.596% 0.11121 253.038);   /* #00244b */
     --primary-foreground: oklch(1 0 0);
 
     /* Secundario y neutros */
@@ -115,10 +115,10 @@
 }
 
 .dark {
-    /* Superficies — fondo con tinte azul institucional sutil */
-    --background:       oklch(0.13 0.015 252);
+    /* Superficies */
+    --background:       oklch(9.618% 0.00936 258.726);
     --foreground:       oklch(0.95 0.005 247);
-    --card:             oklch(0.18 0.012 252);
+    --card:             #1b1f23;
     --card-foreground:  oklch(0.95 0.005 247);
     --popover:          oklch(0.18 0.012 252);
     --popover-foreground: oklch(0.95 0.005 247);
