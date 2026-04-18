@@ -10,6 +10,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -29,6 +30,7 @@ import { MatchingService, ScoredProject } from './matching.service';
 import { CreateProyectoDto } from './dto/create-proyecto.dto';
 import { UpdateProyectoDto } from './dto/update-proyecto.dto';
 import { ChangeStatusDto } from './dto/change-status.dto';
+import { FilterProyectosDto } from './dto/filter-proyectos.dto';
 import { Proyecto } from './entities/proyecto.entity';
 
 interface AuthenticatedRequest extends Request {
@@ -73,6 +75,20 @@ export class ProyectosController {
     @Body() dto: CreateProyectoDto,
   ): Promise<Proyecto> {
     return this.proyectosService.create(dto, req.user.laboratorioId!);
+  }
+
+  @Get('projects')
+  @Roles(UserRole.ALUMNO)
+  @ApiOperation({ summary: 'Listar proyectos activos (Solo Alumno)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de proyectos activos.',
+    type: [Proyecto],
+  })
+  findAllActive(
+    @Query() filters: FilterProyectosDto,
+  ): Promise<{ data: Proyecto[]; total: number }> {
+    return this.proyectosService.findAllActive(filters);
   }
 
   @Get('projects/my')

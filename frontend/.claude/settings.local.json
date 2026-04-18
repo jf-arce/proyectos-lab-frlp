@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(npx shadcn:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npm run *)",
+      "Skill(shadcn)"
     ]
   }
 }
