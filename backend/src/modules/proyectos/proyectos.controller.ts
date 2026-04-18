@@ -26,6 +26,7 @@ import { RolesGuard } from '@/modules/auth/roles.guard';
 import { Roles } from '@/modules/auth/roles.decorator';
 import { UserRole } from '@/modules/users/entities/user.entity';
 import { ProyectosService } from './proyectos.service';
+import { MatchingService, ScoredProject } from './matching.service';
 import { CreateProyectoDto } from './dto/create-proyecto.dto';
 import { UpdateProyectoDto } from './dto/update-proyecto.dto';
 import { ChangeStatusDto } from './dto/change-status.dto';
@@ -46,7 +47,23 @@ interface AuthenticatedRequest extends Request {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller()
 export class ProyectosController {
-  constructor(private readonly proyectosService: ProyectosService) {}
+  constructor(
+    private readonly proyectosService: ProyectosService,
+    private readonly matchingService: MatchingService,
+  ) {}
+
+  @Get('projects/recommended')
+  @Roles(UserRole.ALUMNO)
+  @ApiOperation({
+    summary: 'Proyectos recomendados para el alumno ordenados por score de compatibilidad',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de proyectos activos con score de compatibilidad, ordenados de mayor a menor.',
+  })
+  getRecommended(@Req() req: AuthenticatedRequest): Promise<ScoredProject[]> {
+    return this.matchingService.getRecommendations(req.user.userId);
+  }
 
   @Post('projects')
   @Roles(UserRole.RESPONSABLE_LABORATORIO)

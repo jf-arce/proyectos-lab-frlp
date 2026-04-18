@@ -6,7 +6,17 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Proyecto } from '@/modules/proyectos/entities/proyecto.entity';
+import { AlumnoService } from '@/modules/alumno/alumno.service';
+import {
+  POSTULACION_CREADA,
+  PostulacionCreadaEvent,
+} from '@/modules/notifications/events/postulacion-creada.event';
+import {
+  POSTULACION_ESTADO_ACTUALIZADO,
+  PostulacionEstadoActualizadoEvent,
+} from '@/modules/notifications/events/postulacion-estado-actualizado.event';
 import { Postulacion } from './entities/postulacion.entity';
 import { UpdatePostulacionEstadoDto } from './dto/update-postulacion-estado.dto';
 import { PostulacionEstado } from './enums/postulacion-estado.enum';
@@ -18,6 +28,8 @@ export class PostulacionesService {
     private readonly postulacionRepository: Repository<Postulacion>,
     @InjectRepository(Proyecto)
     private readonly proyectoRepository: Repository<Proyecto>,
+    private readonly eventEmitter: EventEmitter2,
+    private readonly alumnoService: AlumnoService,
   ) {}
 
   async getApplications(
@@ -58,7 +70,40 @@ export class PostulacionesService {
     }
 
     postulacion.estado = dto.estado;
-    return this.postulacionRepository.save(postulacion);
+    const updated = await this.postulacionRepository.save(postulacion);
+
+    const event = new PostulacionEstadoActualizadoEvent();
+    event.postulacionId = updated.id;
+    event.nuevoEstado = updated.estado;
+    this.eventEmitter.emit(POSTULACION_ESTADO_ACTUALIZADO, event);
+
+    return updated;
+  }
+
+  async postular(projectId: string, userId: string): Promise<Postulacion> {
+    const proyecto = await this.findProyectoOrFail(projectId);
+    const alumno = await this.alumnoService.findByUserId(userId);
+
+    const check = await this.postulacionRepository.findOne({
+      where: { proyecto: { id: projectId }, alumno: { id: alumno.id } },
+    });
+
+    if (check) {
+      throw new BadRequestException('Ya te postulaste a este proyecto');
+    }
+
+    const postulacion = this.postulacionRepository.create({
+      proyecto,
+      alumno,
+      estado: PostulacionEstado.PENDIENTE,
+    });
+    const saved = await this.postulacionRepository.save(postulacion);
+
+    const event = new PostulacionCreadaEvent();
+    event.postulacionId = saved.id;
+    this.eventEmitter.emit(POSTULACION_CREADA, event);
+
+    return saved;
   }
 
   private async findProyectoOrFail(id: string): Promise<Proyecto> {

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { databaseConfig } from './config/database.config';
 import { validationSchema } from './config/validation.schema';
 import { UsersModule } from '@/modules/users/users.module';
@@ -11,6 +12,7 @@ import { ResponsableLaboratorioModule } from '@/modules/responsable-laboratorio/
 import { SkillsModule } from '@/modules/skills/skills.module';
 import { ProyectosModule } from '@/modules/proyectos/proyectos.module';
 import { PostulacionesModule } from '@/modules/postulaciones/postulaciones.module';
+import { NotificationsModule } from '@/modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -38,6 +40,7 @@ import { PostulacionesModule } from '@/modules/postulaciones/postulaciones.modul
         };
       },
     }),
+    EventEmitterModule.forRoot(),
     UsersModule,
     AuthModule,
     LaboratorioModule,
@@ -46,6 +49,7 @@ import { PostulacionesModule } from '@/modules/postulaciones/postulaciones.modul
     SkillsModule,
     ProyectosModule,
     PostulacionesModule,
+    NotificationsModule,
   ],
   controllers: [],
   providers: [],

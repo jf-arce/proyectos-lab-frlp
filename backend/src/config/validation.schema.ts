@@ -14,4 +14,6 @@ export const validationSchema = Joi.object({
   JWT_EXPIRATION: Joi.string().default('15m'),
   REFRESH_TOKEN_EXPIRATION_DAYS: Joi.number().default(7),
   CORS_ORIGINS: Joi.string().default('http://localhost:5173'),
+  RESEND_API_KEY: Joi.string().optional().allow(''),
+  RESEND_FROM: Joi.string().default('Portal Lab FRLP <no-reply@resend.dev>'),
 });
