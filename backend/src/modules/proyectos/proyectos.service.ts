@@ -38,6 +38,7 @@ export class ProyectosService {
   findMyProjects(laboratorioId: string): Promise<Proyecto[]> {
     return this.proyectoRepository.find({
       where: { laboratorio: { id: laboratorioId } },
+      relations: ['postulaciones', 'postulaciones.alumno'],
       order: { createdAt: 'DESC' },
     });
   }
