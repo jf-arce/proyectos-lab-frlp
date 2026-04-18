@@ -5,6 +5,7 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
+  Post,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -79,5 +80,24 @@ export class PostulacionesController {
       dto,
       req.user.laboratorioId!,
     );
+  }
+
+  @Post('projects/:id/apply')
+  @Roles(UserRole.ALUMNO)
+  @ApiOperation({ summary: 'Postularse a un proyecto' })
+  @ApiResponse({
+    status: 201,
+    description: 'Postulación creada exitosamente.',
+    type: Postulacion,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Ya te postulaste a este proyecto.',
+  })
+  apply(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<Postulacion> {
+    return this.postulacionesService.postular(id, req.user.userId);
   }
 }
