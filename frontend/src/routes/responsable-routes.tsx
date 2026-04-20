@@ -3,6 +3,7 @@ import { Role } from '@/types/auth';
 import { ResponsableDashboardPage } from '@/pages/responsable/dashboard-page';
 import { LaboratorioPage } from '@/pages/responsable/laboratorio-page';
 import { ProjectPostulacionesPage } from '@/pages/responsable/project-postulaciones-page';
+import { ProjectCreatePage } from '@/pages/responsable/project-create-page';
 import { LabLayout } from '@/layouts/lab-layout';
 
 export const responsableRoutes = [
@@ -14,6 +15,7 @@ export const responsableRoutes = [
         children: [
           { path: '/responsable/dashboard', element: <ResponsableDashboardPage /> },
           { path: '/responsable/laboratorio', element: <LaboratorioPage /> },
+          { path: '/responsable/proyectos/nuevo', element: <ProjectCreatePage /> },
           {
             path: '/responsable/proyectos/:id/postulaciones',
             element: <ProjectPostulacionesPage />,

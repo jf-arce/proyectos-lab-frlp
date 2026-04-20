@@ -30,6 +30,9 @@ export class ProyectosService {
     const proyecto = this.proyectoRepository.create({
       titulo: dto.titulo,
       descripcion: dto.descripcion,
+      cupos: dto.cupos,
+      duracion: dto.duracion,
+      fechaCierre: dto.fechaCierre ? new Date(dto.fechaCierre) : null,
       laboratorio: { id: laboratorioId },
       skills,
     });
@@ -118,6 +121,11 @@ export class ProyectosService {
 
     if (dto.titulo !== undefined) proyecto.titulo = dto.titulo;
     if (dto.descripcion !== undefined) proyecto.descripcion = dto.descripcion;
+    if (dto.cupos !== undefined) proyecto.cupos = dto.cupos;
+    if (dto.duracion !== undefined) proyecto.duracion = dto.duracion;
+    if (dto.fechaCierre !== undefined) {
+      proyecto.fechaCierre = dto.fechaCierre ? new Date(dto.fechaCierre) : null;
+    }
     if (dto.skillIds !== undefined) {
       proyecto.skills = await this.resolveSkills(dto.skillIds);
     }

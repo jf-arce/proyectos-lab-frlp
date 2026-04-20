@@ -38,6 +38,18 @@ export class Proyecto {
   })
   estado!: ProyectoEstado;
 
+  @ApiProperty({ example: 2 })
+  @Column({ type: 'int', default: 0 })
+  cupos!: number;
+
+  @ApiProperty({ example: '1 año' })
+  @Column({ nullable: true })
+  duracion!: string;
+
+  @ApiProperty({ example: '2024-12-31' })
+  @Column({ type: 'date', nullable: true, name: 'fecha_cierre' })
+  fechaCierre!: Date | null;
+
   @ApiProperty({ type: () => Laboratorio })
   @ManyToOne(() => Laboratorio, { eager: true })
   @JoinColumn({ name: 'laboratorio_id' })
