@@ -5,3 +5,9 @@ node_modules/
 .env
 .env.*
 !.env.example
+# Local development files
+backend/src/seed.ts
+dist/
+build/
+*.log
+.DS_Store
