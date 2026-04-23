@@ -13,15 +13,21 @@ export const responsableRoutes = [
       {
         element: <LabLayout />,
         children: [
-          { path: '/responsable/dashboard', element: <ResponsableDashboardPage /> },
+          {
+            path: '/responsable/dashboard',
+            element: <ResponsableDashboardPage />,
+          },
           { path: '/responsable/laboratorio', element: <LaboratorioPage /> },
-          { path: '/responsable/proyectos/nuevo', element: <ProjectCreatePage /> },
+          {
+            path: '/responsable/proyectos/nuevo',
+            element: <ProjectCreatePage />,
+          },
           {
             path: '/responsable/proyectos/:id/postulaciones',
             element: <ProjectPostulacionesPage />,
           },
-        ]
-      }
+        ],
+      },
     ],
   },
 ];
