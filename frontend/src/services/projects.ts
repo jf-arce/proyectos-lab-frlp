@@ -1,5 +1,10 @@
 import { API_URL } from '@/lib/api';
-import type { ProjectFilters, ProjectsPage } from '@/types/projects';
+import type {
+  MyApplication,
+  ProjectDetail,
+  ProjectFilters,
+  ProjectsPage,
+} from '@/types/projects';
 
 async function request<T>(path: string, token: string): Promise<T> {
   const controller = new AbortController();
@@ -9,6 +14,39 @@ async function request<T>(path: string, token: string): Promise<T> {
   try {
     res = await fetch(`${API_URL}${path}`, {
       method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      signal: controller.signal,
+    });
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new Error('El servidor no responde. Verificá tu conexión.');
+    }
+    throw new Error('No se pudo conectar con el servidor.');
+  } finally {
+    clearTimeout(timeout);
+  }
+
+  if (!res.ok) {
+    const error = await res
+      .json()
+      .catch(() => ({ message: 'Error desconocido' }));
+    throw new Error(error.message ?? 'Error en la solicitud');
+  }
+
+  return res.json() as Promise<T>;
+}
+
+async function post<T>(path: string, token: string): Promise<T> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10_000);
+
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
@@ -45,5 +83,20 @@ export const projectsService = {
       params.set('offset', String(filters.offset));
     const qs = params.toString();
     return request<ProjectsPage>(`/projects${qs ? `?${qs}` : ''}`, token);
+  },
+
+  findById(token: string, id: string): Promise<ProjectDetail> {
+    return request<ProjectDetail>(`/projects/${id}`, token);
+  },
+
+  getMyApplications(token: string): Promise<MyApplication[]> {
+    return request<MyApplication[]>('/applications/my', token);
+  },
+
+  applyToProject(
+    token: string,
+    projectId: string,
+  ): Promise<{ id: string; estado: string }> {
+    return post(`/projects/${projectId}/apply`, token);
   },
 };

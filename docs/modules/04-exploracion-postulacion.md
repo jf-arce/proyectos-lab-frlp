@@ -18,8 +18,8 @@ Es la cara pública de la plataforma para los alumnos. Permite descubrir todos l
 
 ### Vista de detalle de proyecto
 
-- Endpoint `GET /projects/:id` que devuelve la información completa: título, descripción, requisitos, cupo, laboratorio, habilidades requeridas, fecha de publicación.
-- Si el alumno autenticado ya se postuló, la respuesta debe indicarlo (`hasApplied: true`) para que la UI muestre el botón deshabilitado.
+- Endpoint `GET /projects/:id` (rol `ALUMNO`) que devuelve la información completa: título, descripción, cupo, duracion, laboratorio (nombre, descripción, emailContacto), habilidades requeridas, fecha de publicación.
+- Para determinar si el alumno ya se postuló, el frontend llama en paralelo a `GET /applications/my` y verifica si alguna postulación corresponde al proyecto actual. El endpoint de detalle no incluye `hasApplied` en su respuesta.
 
 ### Postulación con un clic
 
@@ -41,8 +41,8 @@ Es la cara pública de la plataforma para los alumnos. Permite descubrir todos l
 
 | Método | Ruta | Auth | Descripción |
 |--------|------|------|-------------|
-| `GET` | `/projects` | Opcional | Listar proyectos activos con filtros |
-| `GET` | `/projects/:id` | Opcional | Detalle de un proyecto |
+| `GET` | `/projects` | ALUMNO | Listar proyectos activos con filtros |
+| `GET` | `/projects/:id` | ALUMNO | Detalle de un proyecto |
 | `POST` | `/projects/:id/apply` | ALUMNO | Postularse a un proyecto |
 | `DELETE` | `/projects/:id/apply` | ALUMNO | Retirar postulación (opcional) |
 | `GET` | `/applications/my` | ALUMNO | Historial de postulaciones |
@@ -94,22 +94,19 @@ if (filters.search) {
 ```
 pages/
 └── alumno/
-    ├── labs-page.tsx               # listado de laboratorios con descripción breve y preview de proyectos
-    ├── lab-detail-page.tsx         # detalle de un lab: descripción, equipo y proyectos destacados
-    ├── lab-projects-page.tsx       # todos los proyectos activos del lab, con filtros y botón de postulación
-    └── my-applications-page.tsx    # historial de postulaciones del alumno
+    ├── dashboard-page.tsx          # /alumno/dashboard — exploración y recomendaciones
+    ├── project-detail-page.tsx     # /alumno/proyecto/:id — detalle + botón postularse
+    ├── postulaciones-page.tsx      # /alumno/postulaciones — historial del alumno
+    ├── labs-page.tsx               # /alumno/laboratorios — listado de laboratorios
+    └── lab-detail-page.tsx         # /alumno/laboratorios/:id — detalle de un lab
 
-components/alumno/
-├── lab-card.tsx                    # tarjeta de laboratorio en el listado
-├── project-card.tsx                # tarjeta de proyecto en el listado del lab
-├── project-filters.tsx             # panel de filtros (habilidades, búsqueda)
-├── apply-button.tsx                # botón que maneja el estado (postularse / ya postulado)
-└── application-status-badge.tsx    # badge con color por estado
+services/
+└── projects.ts                     # findAll, findById, getMyApplications, applyToProject
 ```
 
 ## Consideraciones
 
 - El botón "Postularse" debe desactivarse si: el alumno ya se postuló, el proyecto está cerrado, o el cupo está lleno.
-- Para mostrar correctamente `hasApplied`, el endpoint de detalle de proyecto debe recibir el token del alumno (si está autenticado) y consultarlo. Si el usuario no está autenticado, simplemente no se muestra el botón de postulación.
+- Para mostrar correctamente `hasApplied`, la página de detalle llama en paralelo a `GET /projects/:id` y `GET /applications/my`, y deriva el estado localmente. Esto reutiliza el endpoint de historial y evita exponer datos de postulaciones en la respuesta del proyecto.
 - El historial de postulaciones es el punto de contacto del alumno con el estado actualizado por el responsable — es importante que se actualice en tiempo razonable (polling o websockets según se decida en Módulo 5).
 - Considerar añadir un índice en `(student_id, project_id)` en la tabla `applications` para acelerar la verificación de duplicados.

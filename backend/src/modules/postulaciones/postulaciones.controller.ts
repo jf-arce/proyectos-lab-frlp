@@ -82,6 +82,14 @@ export class PostulacionesController {
     );
   }
 
+  @Get('applications/my')
+  @Roles(UserRole.ALUMNO)
+  @ApiOperation({ summary: 'Listar mis postulaciones' })
+  @ApiResponse({ status: 200, type: [Postulacion] })
+  getMyApplications(@Req() req: AuthenticatedRequest): Promise<Postulacion[]> {
+    return this.postulacionesService.getMyApplications(req.user.userId);
+  }
+
   @Post('projects/:id/apply')
   @Roles(UserRole.ALUMNO)
   @ApiOperation({ summary: 'Postularse a un proyecto' })

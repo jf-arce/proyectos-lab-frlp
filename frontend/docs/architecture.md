@@ -55,12 +55,13 @@ src/
 │       └── project-postulaciones-page.tsx   # /responsable/proyectos/:id/postulaciones
 │
 ├── services/                    # Llamadas a la API REST, una por dominio
-│   ├── auth.ts
-│   ├── projects.ts
-│   ├── profile.ts
-│   ├── applications.ts
-│   ├── notifications.ts
-│   └── matching.ts
+│   ├── auth.ts                  # login, register, refresh, logout
+│   ├── projects.ts              # findAll, findById, applyToProject, getMyApplications
+│   ├── proyectos.ts             # operaciones del responsable (create, update, status)
+│   ├── skills.ts
+│   ├── profile.ts               # (pendiente)
+│   ├── notifications.ts         # (pendiente)
+│   └── matching.ts              # (pendiente — recomendaciones ya en projects.ts)
 │
 └── types/                       # Tipos TypeScript compartidos
     ├── auth.ts

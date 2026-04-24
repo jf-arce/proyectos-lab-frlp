@@ -103,6 +103,17 @@ export class ProyectosService {
     return { data, total };
   }
 
+  async findOneForAlumno(id: string): Promise<Proyecto> {
+    const proyecto = await this.proyectoRepository.findOne({
+      where: { id },
+      relations: ['laboratorio', 'skills'],
+    });
+    if (!proyecto) {
+      throw new NotFoundException(`Proyecto con id ${id} no encontrado`);
+    }
+    return proyecto;
+  }
+
   findMyProjects(laboratorioId: string): Promise<Proyecto[]> {
     return this.proyectoRepository.find({
       where: { laboratorio: { id: laboratorioId } },

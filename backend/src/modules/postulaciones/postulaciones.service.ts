@@ -80,6 +80,15 @@ export class PostulacionesService {
     return updated;
   }
 
+  async getMyApplications(userId: string): Promise<Postulacion[]> {
+    const alumno = await this.alumnoService.findByUserId(userId);
+    return this.postulacionRepository.find({
+      where: { alumno: { id: alumno.id } },
+      relations: ['proyecto'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
   async postular(projectId: string, userId: string): Promise<Postulacion> {
     const proyecto = await this.findProyectoOrFail(projectId);
     const alumno = await this.alumnoService.findByUserId(userId);
