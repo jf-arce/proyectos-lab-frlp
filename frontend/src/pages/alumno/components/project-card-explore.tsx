@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SkillTag } from '@/components/ui/skill-tag';
 import type { ExploreProject } from '@/types/projects';
+import { Link } from 'react-router';
 
 const NOW = Date.now();
 
@@ -53,8 +54,8 @@ export function ProjectCardExplore({ project }: { project: ExploreProject }) {
           ))}
         </div>
 
-        <Button variant="default" className="h-10 w-full mt-auto">
-          Ver detalles
+        <Button variant="default" className="h-10 w-full mt-auto" asChild>
+          <Link to={`/alumno/proyecto/${project.id}`}>Ver detalles</Link>
         </Button>
       </CardContent>
     </Card>

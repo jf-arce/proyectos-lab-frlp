@@ -55,11 +55,13 @@ export class ProyectosController {
   @Get('projects/recommended')
   @Roles(UserRole.ALUMNO)
   @ApiOperation({
-    summary: 'Proyectos recomendados para el alumno ordenados por score de compatibilidad',
+    summary:
+      'Proyectos recomendados para el alumno ordenados por score de compatibilidad',
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista de proyectos activos con score de compatibilidad, ordenados de mayor a menor.',
+    description:
+      'Lista de proyectos activos con score de compatibilidad, ordenados de mayor a menor.',
   })
   getRecommended(@Req() req: AuthenticatedRequest): Promise<ScoredProject[]> {
     return this.matchingService.getRecommendations(req.user.userId);
@@ -101,6 +103,15 @@ export class ProyectosController {
   })
   findMyProjects(@Req() req: AuthenticatedRequest): Promise<Proyecto[]> {
     return this.proyectosService.findMyProjects(req.user.laboratorioId!);
+  }
+
+  @Get('projects/:id')
+  @Roles(UserRole.ALUMNO)
+  @ApiOperation({ summary: 'Obtener detalle de un proyecto' })
+  @ApiResponse({ status: 200, type: Proyecto })
+  @ApiResponse({ status: 404, description: 'Proyecto no encontrado.' })
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Proyecto & { cuposOcupados: number }> {
+    return this.proyectosService.findOneForAlumno(id);
   }
 
   @Put('projects/:id')
