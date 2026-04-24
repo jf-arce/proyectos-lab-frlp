@@ -21,6 +21,7 @@ export interface Proyecto {
   createdAt: string;
   updatedAt?: string;
   postulaciones?: Postulacion[];
+  skills?: { id: string; nombre: string; categoria?: string }[];
 }
 
 export const proyectosService = {
@@ -79,7 +80,7 @@ export const proyectosService = {
     return res.json();
   },
 
-  async updateProject(id: string, data: Partial<Proyecto>, token: string): Promise<Proyecto> {
+  async updateProject(id: string, data: Partial<Proyecto> & { skillIds?: string[] }, token: string): Promise<Proyecto> {
     const res = await fetch(`${API_URL}/projects/${id}`, {
       method: 'PUT',
       headers: {

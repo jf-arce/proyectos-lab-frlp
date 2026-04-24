@@ -14,7 +14,9 @@ export class LaboratorioService {
     return this.laboratorioRepository.find({ order: { nombre: 'ASC' } });
   }
 
-  findById(id: string): Promise<Laboratorio | null> {
-    return this.laboratorioRepository.findOne({ where: { id } });
+  async findOne(id: string): Promise<Laboratorio> {
+    const lab = await this.laboratorioRepository.findOne({ where: { id } });
+    if (!lab) throw new Error('Laboratorio no encontrado');
+    return lab;
   }
 }

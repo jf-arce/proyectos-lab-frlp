@@ -16,6 +16,9 @@ Un proyecto tiene los siguientes atributos:
 |-------|------|-------------|
 | `titulo` | string | Nombre del proyecto |
 | `descripcion` | text | Descripción detallada |
+| `cupos` | number | Cantidad de vacantes disponibles |
+| `duracion` | string | Tiempo estimado (ej: "3 meses", "anual") |
+| `fechaCierre` | date | Límite para recibir postulaciones |
 | `estado` | enum | `ACTIVO` \| `CERRADO` |
 | `laboratorio` | relación | Laboratorio al que pertenece |
 | `skills` | relación M:N | Habilidades requeridas (tags) |
@@ -38,6 +41,8 @@ Desde el panel del responsable, puede ver las postulaciones a cada proyecto y ca
 |--------|------|-------------|
 | `GET` | `/projects/:id/applications` | Ver postulaciones de un proyecto |
 | `PATCH` | `/applications/:id/status` | Cambiar estado: `PENDIENTE` → `ACEPTADA` \| `RECHAZADA` |
+
+Además de la gestión de estados, el responsable puede acceder a la vista de perfil de cada alumno postulante mediante el enlace **"Ver perfil"**, que abre una vista detallada pero de solo lectura del candidato.
 
 > Estos endpoints están implementados en `PostulacionesController` (`src/modules/postulaciones/`), no en `ProyectosController`. Ver estructura en el Módulo 4.
 
@@ -95,6 +100,15 @@ export class Proyecto {
 
   @Column('text')
   descripcion: string;
+
+  @Column({ default: 0 })
+  cupos: number;
+
+  @Column({ nullable: true })
+  duracion: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  fechaCierre: Date;
 
   @Column({ type: 'enum', enum: ProyectoEstado, default: ProyectoEstado.ACTIVO })
   estado: ProyectoEstado;
@@ -174,6 +188,6 @@ src/modules/laboratorios/
 
 ## Consideraciones
 
-- Al cerrar un proyecto (`CERRADO`), las postulaciones pendientes deben mantenerse en la base de datos para historial, pero el proyecto debe desaparecer de las sugerencias y del listado público de activos.
-- El cambio de estado de postulación es el evento que dispara las notificaciones del Módulo 5 — el servicio de proyectos debe emitir un evento interno con `EventEmitter2` para desacoplar la lógica de notificaciones.
-- Usar `EventEmitter2` de NestJS para desacoplar la lógica de notificaciones del servicio de proyectos.
+- Al cerrar un proyecto (`CERRADO`), las postulaciones pendientes deben mantenerse en la base de datos para historial.
+- El cambio de estado de postulación es el evento que dispara las notificaciones del Módulo 5.
+- La interfaz de edición de proyectos en el frontend utiliza un **modal de pantalla completa** (80-90% de viewport) para permitir una gestión cómoda de la descripción extensa y la selección de múltiples habilidades.

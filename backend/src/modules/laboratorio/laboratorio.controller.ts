@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LaboratorioService } from './laboratorio.service';
 import { Laboratorio } from './entities/laboratorio.entity';
@@ -17,5 +17,16 @@ export class LaboratorioController {
   })
   findAll(): Promise<Laboratorio[]> {
     return this.laboratorioService.findAll();
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Obtener un laboratorio por ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Laboratorio obtenido exitosamente.',
+    type: Laboratorio,
+  })
+  findOne(@Param('id') id: string): Promise<Laboratorio> {
+    return this.laboratorioService.findOne(id);
   }
 }

@@ -17,7 +17,7 @@ export interface JwtPayload {
   role: Role;
   nombre: string;
   apellido: string;
-  laboratoryId?: string;
+  laboratorioId?: string;
   exp?: number;
 }
 
@@ -161,7 +161,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     const storedRefreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
     if (storedRefreshToken) {
-      await authService.logout(storedRefreshToken).catch(() => {});
+      await authService.logout(storedRefreshToken).catch(() => { });
     }
     clearSession();
     navigate('/login', { replace: true });

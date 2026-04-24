@@ -52,6 +52,17 @@ export class AlumnoService {
     return alumno;
   }
 
+  async findById(id: string): Promise<Alumno> {
+    const alumno = await this.alumnoRepository.findOne({
+      where: { id },
+      relations: ['usuario'],
+    });
+    if (!alumno) {
+      throw new NotFoundException('Alumno no encontrado');
+    }
+    return alumno;
+  }
+
   async updateProfile(userId: string, dto: UpdateAlumnoDto): Promise<Alumno> {
     const alumno = await this.findByUserId(userId);
 
