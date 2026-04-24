@@ -1,21 +1,21 @@
 import { useEffect, useState } from 'react';
-import { 
-  Download, 
-  Plus, 
-  UserPlus, 
-  Rocket, 
-  Search, 
-  Eye, 
-  Pencil, 
-  Ban, 
-  History, 
-  ChevronLeft, 
+import {
+  Plus,
+  UserPlus,
+  Rocket,
+  Search,
+  Eye,
+  Pencil,
+  Ban,
+  History,
+  ChevronLeft,
   ChevronRight,
-  TrendingUp
+  TrendingUp,
+  Users
 } from 'lucide-react';
 import { Link } from 'react-router';
 import { useAuth } from '@/hooks/use-auth';
-import { 
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -25,10 +25,12 @@ import {
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { proyectosService, type Proyecto, type Postulacion } from '@/services/proyectos';
+import { skillsService, type Skill } from '@/services/skills';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 
@@ -36,7 +38,7 @@ export function ResponsableDashboardPage() {
   const { token } = useAuth();
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Dialog states
   const [selectedProject, setSelectedProject] = useState<Proyecto | null>(null);
   const [isViewApplicantsOpen, setIsViewApplicantsOpen] = useState(false);
@@ -47,6 +49,11 @@ export function ResponsableDashboardPage() {
   // Edit form state
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
+  const [editCupos, setEditCupos] = useState(0);
+  const [editDuracion, setEditDuracion] = useState('');
+  const [editFechaCierre, setEditFechaCierre] = useState('');
+  const [editSkillIds, setEditSkillIds] = useState<string[]>([]);
+  const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
 
   const fetchProyectos = async () => {
     if (!token) return;
@@ -64,6 +71,14 @@ export function ResponsableDashboardPage() {
 
   useEffect(() => {
     fetchProyectos();
+    const fetchSkills = async () => {
+      if (!token) return;
+      try {
+        const data = await skillsService.findAll(token);
+        setAvailableSkills(data);
+      } catch (error) { }
+    };
+    fetchSkills();
   }, [token]);
 
   const handleToggleStatus = async (proyecto: Proyecto) => {
@@ -112,6 +127,13 @@ export function ResponsableDashboardPage() {
     setSelectedProject(proyecto);
     setEditTitle(proyecto.titulo);
     setEditDescription(proyecto.descripcion);
+    setEditCupos(proyecto.cupos);
+    setEditDuracion(proyecto.duracion || '');
+    setEditFechaCierre(proyecto.fechaCierre ? proyecto.fechaCierre.split('T')[0] : '');
+    // In a real app, skills would come from the project. 
+    // Assuming Proyecto interface is updated to include skill ids or we just use an empty array for now.
+    // If backend returns skills, we map them.
+    setEditSkillIds(proyecto.skills?.map(s => s.id) || []);
     setIsEditProjectOpen(true);
   };
 
@@ -120,7 +142,11 @@ export function ResponsableDashboardPage() {
     try {
       await proyectosService.updateProject(selectedProject.id, {
         titulo: editTitle,
-        descripcion: editDescription
+        descripcion: editDescription,
+        cupos: editCupos,
+        duracion: editDuracion,
+        fechaCierre: editFechaCierre,
+        skillIds: editSkillIds
       }, token);
       toast.success('Proyecto actualizado');
       setIsEditProjectOpen(false);
@@ -131,7 +157,7 @@ export function ResponsableDashboardPage() {
   };
 
   const proyectosActivos = proyectos.filter(p => p.estado === 'ACTIVO').length;
-  const nuevasPostulaciones = proyectos.reduce((acc, p) => 
+  const nuevasPostulaciones = proyectos.reduce((acc, p) =>
     acc + (p.postulaciones?.filter(post => post.estado === 'PENDIENTE').length || 0), 0
   );
 
@@ -156,12 +182,8 @@ export function ResponsableDashboardPage() {
           </p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" className="gap-2 shadow-sm">
-            <Download className="size-4" />
-            Reporte
-          </Button>
           <Link to="/responsable/proyectos/nuevo">
-            <Button className="gap-2 shadow-md font-semibold">
+            <Button className="gap-2 shadow-md h-12 px-4 font-semibold">
               <Plus className="size-5" />
               Nuevo Proyecto
             </Button>
@@ -229,7 +251,7 @@ export function ResponsableDashboardPage() {
           <h3 className="text-xl font-bold text-primary tracking-tight">Mis Proyectos</h3>
           <div className="relative w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input 
+            <Input
               className="pl-9 bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
               placeholder="Buscar proyecto..."
             />
@@ -315,7 +337,7 @@ export function ResponsableDashboardPage() {
                         )}
                       </td>
                       <td className="px-8 py-5 text-center">
-                        <Badge 
+                        <Badge
                           variant={!isClosed ? "default" : "secondary"}
                           className={cn(
                             "px-3 py-0.5 text-[10px] uppercase tracking-tighter font-extrabold shadow-sm",
@@ -395,13 +417,6 @@ export function ResponsableDashboardPage() {
         )}
       </section>
 
-      {/* FAB for quick action */}
-      <Link to="/responsable/proyectos/nuevo">
-        <Button className="fixed bottom-8 right-8 z-50 size-14 rounded-full shadow-lg hover:scale-110 active:scale-95 transition-all">
-          <Plus className="size-6" />
-        </Button>
-      </Link>
-
       {/* View Applicants Dialog */}
       <Dialog open={isViewApplicantsOpen} onOpenChange={setIsViewApplicantsOpen}>
         <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] flex flex-col p-0 overflow-hidden">
@@ -435,13 +450,21 @@ export function ResponsableDashboardPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-bold text-sm text-foreground">{post.alumno.nombre} {post.alumno.apellido}</p>
+                        <div className="flex items-center gap-3">
+                          <p className="font-bold text-sm text-foreground">{post.alumno.nombre} {post.alumno.apellido}</p>
+                          <Link
+                            to={`/responsable/alumnos/${post.alumno.id}`}
+                            className="text-[10px] bg-primary/5 hover:bg-primary/10 text-primary px-1.5 py-0.5 rounded font-black uppercase tracking-tighter transition-colors"
+                          >
+                            Ver Perfil
+                          </Link>
+                        </div>
                         <div className="flex items-center gap-2 mt-1">
                           <Badge variant="outline" className={cn(
                             "text-[10px] uppercase font-black px-1.5 h-4 tracking-tighter",
-                            post.estado === 'ACEPTADO' ? 'text-green-600 border-green-200 bg-green-50' : 
-                            post.estado === 'RECHAZADO' ? 'text-red-600 border-red-200 bg-red-50' : 
-                            'text-amber-600 border-amber-200 bg-amber-50'
+                            post.estado === 'ACEPTADO' ? 'text-green-600 border-green-200 bg-green-50' :
+                              post.estado === 'RECHAZADO' ? 'text-red-600 border-red-200 bg-red-50' :
+                                'text-amber-600 border-amber-200 bg-amber-50'
                           )}>
                             {post.estado}
                           </Badge>
@@ -451,16 +474,16 @@ export function ResponsableDashboardPage() {
                     </div>
                     {post.estado === 'PENDIENTE' && (
                       <div className="flex gap-2 w-full sm:w-auto justify-end">
-                        <Button 
-                          size="sm" 
-                          variant="ghost" 
+                        <Button
+                          size="sm"
+                          variant="ghost"
                           className="h-9 px-4 text-xs font-bold text-destructive hover:bg-destructive/10 rounded-lg transition-all"
                           onClick={() => handleUpdateApplication(post.id, 'RECHAZADO')}
                         >
                           Rechazar
                         </Button>
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           className="h-9 px-5 text-xs font-bold rounded-lg shadow-md hover:scale-105 active:scale-95 transition-all"
                           onClick={() => handleUpdateApplication(post.id, 'ACEPTADO')}
                         >
@@ -478,36 +501,114 @@ export function ResponsableDashboardPage() {
 
       {/* Edit Project Dialog */}
       <Dialog open={isEditProjectOpen} onOpenChange={setIsEditProjectOpen}>
-        <DialogContent>
+        <DialogContent className="w-[90vw] h-[90vh] max-w-none sm:max-w-none overflow-y-auto custom-scrollbar p-16">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Editar Proyecto</DialogTitle>
-            <DialogDescription>
-              Modificá los detalles básicos de la convocatoria.
+            <DialogTitle className="text-2xl font-black text-primary">Editar Proyecto</DialogTitle>
+            <DialogDescription className="font-medium">
+              Modificá todos los parámetros de la convocatoria de investigación.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-5 py-4">
-            <div className="space-y-2">
-              <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">Título del Proyecto</label>
-              <Input 
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                placeholder="Título del proyecto"
-                className="bg-muted/30 border-none h-11 px-4 text-sm font-medium focus-visible:ring-1 focus-visible:ring-primary/40"
-              />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+            {/* Left Column: Basic Info */}
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">Título del Proyecto</label>
+                <Input
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  placeholder="Título del proyecto"
+                  className="bg-muted/30 border-none h-11 px-4 text-sm font-medium focus-visible:ring-1 focus-visible:ring-primary/40"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">Descripción detallada</label>
+                <Textarea
+                  className="min-h-[180px] bg-muted/30 border-none p-4 text-sm font-medium focus-visible:ring-1 focus-visible:ring-primary/40 rounded-xl"
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  placeholder="Breve descripción de los objetivos..."
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">Descripción detallada</label>
-              <textarea 
-                className="flex min-h-[120px] w-full rounded-xl border-none bg-muted/30 px-4 py-3 text-sm font-medium shadow-none placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/40 disabled:cursor-not-allowed disabled:opacity-50 transition-all"
-                value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
-                placeholder="Breve descripción de los objetivos..."
-              />
+
+            {/* Right Column: Logistics & Skills */}
+            <div className="space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">Cupos</label>
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      value={editCupos}
+                      onChange={(e) => setEditCupos(parseInt(e.target.value))}
+                      className="bg-muted/30 border-none h-11 pl-4 pr-10 font-bold focus-visible:ring-1 focus-visible:ring-primary/40"
+                    />
+                    <Users className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground opacity-50" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">Duración</label>
+                  <select
+                    value={editDuracion}
+                    onChange={(e) => setEditDuracion(e.target.value)}
+                    className="w-full h-11 bg-muted/30 border-none rounded-md px-4 font-bold text-sm focus:ring-1 focus:ring-primary/40 outline-none cursor-pointer"
+                  >
+                    <option>3 meses</option>
+                    <option>6 meses</option>
+                    <option>1 año</option>
+                    <option>Indefinido</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">Cierre de inscripciones</label>
+                <div className="relative">
+                  <Input
+                    type="date"
+                    value={editFechaCierre}
+                    onChange={(e) => setEditFechaCierre(e.target.value)}
+                    className="bg-muted/30 border-none h-11 px-4 font-bold text-sm focus-visible:ring-1 focus-visible:ring-primary/40 [color-scheme:light]"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">Habilidades Requeridas</label>
+                <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-2 bg-muted/20 rounded-xl border border-border/20">
+                  {availableSkills.map((skill) => {
+                    const isSelected = editSkillIds.includes(skill.id);
+                    return (
+                      <button
+                        key={skill.id}
+                        type="button"
+                        onClick={() => {
+                          setEditSkillIds(prev =>
+                            prev.includes(skill.id) ? prev.filter(id => id !== skill.id) : [...prev, skill.id]
+                          );
+                        }}
+                        className={cn(
+                          "px-3 py-1 rounded-full text-[10px] font-bold transition-all border",
+                          isSelected
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-background text-muted-foreground border-border hover:border-primary/40"
+                        )}
+                      >
+                        {skill.nombre}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
-          <DialogFooter className="gap-2 pt-2">
-            <Button variant="outline" className="h-11 px-6 rounded-xl font-bold" onClick={() => setIsEditProjectOpen(false)}>Cancelar</Button>
-            <Button className="h-11 px-8 rounded-xl font-bold shadow-md hover:scale-105 active:scale-95 transition-all" onClick={handleSaveEdit}>Guardar Cambios</Button>
+
+          <DialogFooter className="gap-2 sm:justify-end border-t border-border/20 pt-6">
+            <Button variant="ghost" className="h-12 px-6 rounded-xl font-bold" onClick={() => setIsEditProjectOpen(false)}>Cancelar</Button>
+            <Button className="h-12 px-10 rounded-xl font-bold shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all bg-primary" onClick={handleSaveEdit}>Guardar Cambios</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

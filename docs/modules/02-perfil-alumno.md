@@ -29,11 +29,12 @@ El alumno puede ver y editar los siguientes campos:
 | Método | Ruta | Descripción |
 |--------|------|-------------|
 | `GET` | `/profile/me` | Obtiene el perfil del alumno autenticado |
+| `GET` | `/profile/:id` | Obtiene el perfil de un alumno específico (uso del responsable) |
 | `PUT` | `/profile/me` | Actualiza los datos del perfil |
 | `POST` | `/profile/me/skills` | Agrega habilidades al perfil |
 | `DELETE` | `/profile/me/skills/:skillId` | Elimina una habilidad del perfil |
 
-Todos los endpoints requieren rol `ALUMNO`.
+Los endpoints de edición requieren rol `ALUMNO`. El endpoint `GET /profile/:id` permite acceso tanto a `ALUMNO` (propio) como a `RESPONSABLE_LABORATORIO` para la revisión de candidatos.
 
 ## Estructura de código sugerida
 
@@ -118,7 +119,7 @@ src/modules/skills/
 
 ## Consideraciones
 
-- El registro `Alumno` se crea automáticamente (vacío) cuando el usuario se registra con rol `ALUMNO`, para garantizar que siempre exista el registro.
-- Al postularse a un proyecto (Módulo 4), el backend lee directamente el `Alumno` del usuario autenticado; el alumno no necesita adjuntar nada extra.
+- El registro `Alumno` se crea automáticamente con los datos básicos cuando el usuario se registra.
+- Al postularse a un proyecto (Módulo 4), el responsable puede acceder a este perfil en modo **solo lectura** para evaluar al candidato.
 - El alumno puede cargar `cvArchivoPath` (archivo al servidor), `cvUrl` (link externo), ambos, o ninguno. Ambos campos son nullables.
 - La completitud del perfil (con habilidades cargadas) impacta directamente en la calidad de las sugerencias del motor de matching.

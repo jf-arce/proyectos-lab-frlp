@@ -16,8 +16,9 @@ Los dos roles del sistema son:
 - Endpoint `POST /auth/register` que acepta `email`, `password` y `role`.
 - Validar formato del email y longitud/complejidad mínima de la contraseña.
 - Hashear la contraseña con **bcrypt** antes de persistir (nunca guardar texto plano).
-- Si el rol es `RESPONSABLE_LABORATORIO`, requerir también el `laboratoryId` al que se asocia.
-- Retornar el token JWT directamente tras el registro (o requerir login posterior — definir criterio).
+- Si el rol es `RESPONSABLE_LABORATORIO`:
+    - Registro público: requiere el `laboratoryId` al que se asocia.
+    - Registro por equipo: un responsable autenticado puede registrar a otro nuevo para su mismo laboratorio mediante un diálogo interno de gestión, heredando automáticamente el `laboratoryId`.
 
 ### Login
 
@@ -75,6 +76,9 @@ pages/
 ├── auth/
 │   ├── login-page.tsx
 │   └── register-page.tsx
+└── responsable/
+    └── components/
+        └── add-responsable-dialog.tsx  # diálogo para que un responsable invite a otro
 ```
 
 ## Dependencias y paquetes

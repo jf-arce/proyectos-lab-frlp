@@ -1,9 +1,8 @@
+import { useState, useEffect } from 'react';
 import { Outlet, NavLink } from 'react-router';
 import { 
   LayoutDashboard, 
-  FlaskConical, 
   PlusCircle, 
-  Settings, 
   LogOut,
   ChevronUp,
   Moon,
@@ -13,6 +12,9 @@ import {
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme } from '@/hooks/use-theme';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { responsableService } from '@/services/responsable';
+import { UserPlus } from 'lucide-react';
+import { AddResponsableDialog } from '@/pages/responsable/components/add-responsable-dialog';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -29,9 +31,24 @@ import {
 import { cn } from '@/lib/utils';
 
 export function LabLayout() {
-  const { user, logout } = useAuth();
+  const { user, token, logout } = useAuth();
   const { resolvedTheme, setTheme } = useTheme();
+  const [labName, setLabName] = useState<string>('');
+  const [isAddResponsableOpen, setIsAddResponsableOpen] = useState(false);
   
+  useEffect(() => {
+    const fetchLabName = async () => {
+      if (!token) return;
+      try {
+        const profile = await responsableService.getProfile(token);
+        setLabName(profile.laboratorio.nombre);
+      } catch (error) {
+        console.error('Error fetching responsable profile:', error);
+      }
+    };
+    fetchLabName();
+  }, [token]);
+
   const initials = user
     ? (user.nombre?.[0] || user.email.charAt(0)).toUpperCase() + (user.apellido?.[0] || '').toUpperCase()
     : 'U';
@@ -41,9 +58,11 @@ export function LabLayout() {
       {/* SideNavBar */}
       <aside className="fixed left-0 top-0 z-40 flex h-full w-64 flex-col bg-muted/30 py-6 pr-4 border-r border-border">
         <div className="mb-10 px-6">
-          <h1 className="text-lg font-black tracking-tight text-primary">Gestión Lab</h1>
-          <p className="mt-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            Modo Responsable
+          <h1 className="text-2xl font-black tracking-tighter text-primary leading-tight">
+            {labName || 'Gestión Lab'}
+          </h1>
+          <p className="mt-2 text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
+            Laboratorio de Investigación
           </p>
         </div>
 
@@ -62,23 +81,6 @@ export function LabLayout() {
             <LayoutDashboard className="mr-3 size-5" />
             <span className="text-sm">Panel General</span>
           </NavLink>
-
-          {/* 
-          <NavLink
-            to="/responsable/laboratorio"
-            className={({ isActive }: { isActive: boolean }) =>
-              cn(
-                'group flex items-center rounded-r-full px-6 py-3 transition-transform duration-200',
-                isActive
-                  ? 'bg-primary/10 font-bold text-primary'
-                  : 'text-muted-foreground hover:translate-x-1 hover:bg-muted/50'
-              )
-            }
-          >
-            <FlaskConical className="mr-3 size-5" />
-            <span className="text-sm">Mi Laboratorio</span>
-          </NavLink> 
-          */}
 
           <NavLink
             to="/responsable/proyectos/nuevo"
@@ -120,9 +122,9 @@ export function LabLayout() {
                   <User className="size-4" />
                   Mi perfil
                 </DropdownMenuItem>
-                <DropdownMenuItem className="gap-2">
-                  <Settings className="size-4" />
-                  Configuración
+                <DropdownMenuItem className="gap-2" onClick={() => setIsAddResponsableOpen(true)}>
+                  <UserPlus className="size-4" />
+                  Agregar responsable
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
@@ -165,6 +167,10 @@ export function LabLayout() {
       <main className="ml-64 w-full p-8 px-10">
         <Outlet />
       </main>
+      <AddResponsableDialog 
+        open={isAddResponsableOpen} 
+        onOpenChange={setIsAddResponsableOpen} 
+      />
     </div>
   );
 }

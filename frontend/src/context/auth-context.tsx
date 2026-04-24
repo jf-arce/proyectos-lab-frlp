@@ -16,7 +16,7 @@ export interface JwtPayload {
   role: Role;
   nombre: string;
   apellido: string;
-  laboratoryId?: string;
+  laboratorioId?: string;
 }
 
 interface AuthContextValue {
