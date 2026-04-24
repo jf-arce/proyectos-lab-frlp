@@ -115,10 +115,11 @@ Al agregar nuevas páginas de un rol, solo se edita el archivo de ese rol en `ro
 ## Auth flow
 
 - El JWT (access token, vida 15m) se guarda en **memoria** (estado React) para evitar XSS.
-- El refresh token se guarda en `localStorage` o `httpOnly cookie`.
+- El refresh token (vida 7d) se guarda en `localStorage` bajo la clave `refreshToken`.
 - `AuthContext` expone `user`, `token`, `login()`, `logout()`.
-- Al recargar la página se decodifica el token con `jwt-decode`, se verifica expiración
-  y se restaura la sesión.
+- Al montar la app se intenta restaurar la sesión llamando a `POST /auth/refresh` con el refresh token almacenado.
+- Un timer interno renueva el access token automáticamente 1 minuto antes de que expire, sin interrumpir al usuario. Si el refresh falla, se limpia la sesión y se redirige a `/login`.
+- Ver `docs/decisions/001-auth-frontend.md` para el detalle completo.
 
 ## Components placement
 
