@@ -37,7 +37,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-sm shadow-nav border-b border-border/40">
-      <div className="container mx-auto flex h-14 items-center justify-between px-4 md:px-6 max-w-275">
+      <div className="container mx-auto flex h-14 items-center justify-between px-4 md:px-6 max-w-275 xl:max-w-6xl">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2.5">
             <picture>
@@ -136,9 +136,9 @@ export function Navbar() {
           </DropdownMenu>
         </div>
       </div>
-      <AddResponsableDialog 
-        open={isAddResponsableOpen} 
-        onOpenChange={setIsAddResponsableOpen} 
+      <AddResponsableDialog
+        open={isAddResponsableOpen}
+        onOpenChange={setIsAddResponsableOpen}
       />
     </header>
   );

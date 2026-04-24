@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Outlet, NavLink } from 'react-router';
-import { 
-  LayoutDashboard, 
-  PlusCircle, 
+import {
+  LayoutDashboard,
+  PlusCircle,
   LogOut,
   ChevronUp,
   Moon,
   Sun,
-  User
+  User,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme } from '@/hooks/use-theme';
@@ -15,18 +15,18 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { responsableService } from '@/services/responsable';
 import { UserPlus } from 'lucide-react';
 import { AddResponsableDialog } from '@/pages/responsable/components/add-responsable-dialog';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuGroup, 
-  DropdownMenuItem, 
-  DropdownMenuRadioGroup, 
-  DropdownMenuRadioItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuSub, 
-  DropdownMenuSubContent, 
-  DropdownMenuSubTrigger, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
@@ -35,7 +35,7 @@ export function LabLayout() {
   const { resolvedTheme, setTheme } = useTheme();
   const [labName, setLabName] = useState<string>('');
   const [isAddResponsableOpen, setIsAddResponsableOpen] = useState(false);
-  
+
   useEffect(() => {
     const fetchLabName = async () => {
       if (!token) return;
@@ -50,7 +50,8 @@ export function LabLayout() {
   }, [token]);
 
   const initials = user
-    ? (user.nombre?.[0] || user.email.charAt(0)).toUpperCase() + (user.apellido?.[0] || '').toUpperCase()
+    ? (user.nombre?.[0] || user.email.charAt(0)).toUpperCase() +
+      (user.apellido?.[0] || '').toUpperCase()
     : 'U';
 
   return (
@@ -74,7 +75,7 @@ export function LabLayout() {
                 'group flex items-center rounded-r-full px-6 py-3 transition-transform duration-200',
                 isActive
                   ? 'bg-primary/10 font-bold text-primary'
-                  : 'text-muted-foreground hover:translate-x-1 hover:bg-muted/50'
+                  : 'text-muted-foreground hover:translate-x-1 hover:bg-muted/50',
               )
             }
           >
@@ -89,7 +90,7 @@ export function LabLayout() {
                 'group flex items-center rounded-r-full px-6 py-3 transition-transform duration-200',
                 isActive
                   ? 'bg-primary/10 font-bold text-primary'
-                  : 'text-muted-foreground hover:translate-x-1 hover:bg-muted/50'
+                  : 'text-muted-foreground hover:translate-x-1 hover:bg-muted/50',
               )
             }
           >
@@ -109,20 +110,34 @@ export function LabLayout() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="ml-3 overflow-hidden">
-                    <p className="truncate text-xs font-bold leading-none">{user?.nombre || user?.email?.split('@')[0] || 'Responsable'}</p>
-                    <p className="truncate text-[10px] text-muted-foreground mt-1">Responsable de Lab</p>
+                    <p className="truncate text-xs font-bold leading-none">
+                      {user?.nombre ||
+                        user?.email?.split('@')[0] ||
+                        'Responsable'}
+                    </p>
+                    <p className="truncate text-[10px] text-muted-foreground mt-1">
+                      Responsable de Lab
+                    </p>
                   </div>
                 </div>
                 <ChevronUp className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" side="top" className="w-56" sideOffset={10}>
+            <DropdownMenuContent
+              align="end"
+              side="top"
+              className="w-56"
+              sideOffset={10}
+            >
               <DropdownMenuGroup>
                 <DropdownMenuItem className="gap-2">
                   <User className="size-4" />
                   Mi perfil
                 </DropdownMenuItem>
-                <DropdownMenuItem className="gap-2" onClick={() => setIsAddResponsableOpen(true)}>
+                <DropdownMenuItem
+                  className="gap-2"
+                  onClick={() => setIsAddResponsableOpen(true)}
+                >
                   <UserPlus className="size-4" />
                   Agregar responsable
                 </DropdownMenuItem>
@@ -154,7 +169,11 @@ export function LabLayout() {
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
               <DropdownMenuSeparator />
-              <DropdownMenuItem variant="destructive" className="gap-2" onClick={logout}>
+              <DropdownMenuItem
+                variant="destructive"
+                className="gap-2"
+                onClick={logout}
+              >
                 <LogOut className="size-4" />
                 Cerrar sesión
               </DropdownMenuItem>
@@ -167,12 +186,10 @@ export function LabLayout() {
       <main className="ml-64 w-full p-8 px-10">
         <Outlet />
       </main>
-      <AddResponsableDialog 
-        open={isAddResponsableOpen} 
-        onOpenChange={setIsAddResponsableOpen} 
+      <AddResponsableDialog
+        open={isAddResponsableOpen}
+        onOpenChange={setIsAddResponsableOpen}
       />
     </div>
   );
 }
-
-

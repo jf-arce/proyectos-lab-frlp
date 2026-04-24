@@ -43,7 +43,7 @@ export function LoginForm() {
   async function onSubmit(values: FormValues) {
     try {
       const user = await login(values.email, values.password);
-      toast.success(`¡Bienvenido, ${user.email}!`);
+      toast.success(`¡Bienvenido, ${user.nombre}!`);
       navigate(roleHome(user.role), { replace: true });
     } catch (err) {
       toast.error(

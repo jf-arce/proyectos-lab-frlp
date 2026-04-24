@@ -12,7 +12,7 @@ const router = createBrowserRouter([
   {
     element: (
       <AuthProvider>
-        <Toaster richColors position="bottom-right" />
+        <Toaster position="bottom-right" />
         <Outlet />
       </AuthProvider>
     ),
