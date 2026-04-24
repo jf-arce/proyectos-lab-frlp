@@ -12,6 +12,7 @@ import { ChangeStatusDto } from './dto/change-status.dto';
 import { FilterProyectosDto } from './dto/filter-proyectos.dto';
 import { Proyecto } from './entities/proyecto.entity';
 import { ProyectoEstado } from './enums/proyectos-estados.enum';
+import { PostulacionEstado } from '@/modules/postulaciones/enums/postulacion-estado.enum';
 
 @Injectable()
 export class ProyectosService {
@@ -103,15 +104,23 @@ export class ProyectosService {
     return { data, total };
   }
 
-  async findOneForAlumno(id: string): Promise<Proyecto> {
-    const proyecto = await this.proyectoRepository.findOne({
-      where: { id },
-      relations: ['laboratorio', 'skills'],
-    });
+  async findOneForAlumno(id: string): Promise<Proyecto & { cuposOcupados: number }> {
+    const proyecto = await this.proyectoRepository
+      .createQueryBuilder('proyecto')
+      .leftJoinAndSelect('proyecto.laboratorio', 'laboratorio')
+      .leftJoinAndSelect('proyecto.skills', 'skill')
+      .loadRelationCountAndMap(
+        'proyecto.cuposOcupados',
+        'proyecto.postulaciones',
+        'post',
+        (qb) => qb.where('post.estado = :estado', { estado: PostulacionEstado.ACEPTADA }),
+      )
+      .where('proyecto.id = :id', { id })
+      .getOne();
     if (!proyecto) {
       throw new NotFoundException(`Proyecto con id ${id} no encontrado`);
     }
-    return proyecto;
+    return proyecto as Proyecto & { cuposOcupados: number };
   }
 
   findMyProjects(laboratorioId: string): Promise<Proyecto[]> {

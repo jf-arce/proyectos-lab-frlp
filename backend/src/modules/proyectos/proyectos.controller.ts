@@ -110,7 +110,7 @@ export class ProyectosController {
   @ApiOperation({ summary: 'Obtener detalle de un proyecto' })
   @ApiResponse({ status: 200, type: Proyecto })
   @ApiResponse({ status: 404, description: 'Proyecto no encontrado.' })
-  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Proyecto> {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Proyecto & { cuposOcupados: number }> {
     return this.proyectosService.findOneForAlumno(id);
   }
 

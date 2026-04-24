@@ -99,7 +99,7 @@ export function ProjectDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* ── Left column ── */}
-        <div className="lg:col-span-8 space-y-6">
+        <div className="lg:col-span-8 space-y-6 flex flex-col justify-between h-full">
           <Card>
             <CardContent className="pt-6 space-y-5">
               <div className="flex flex-wrap gap-2">
@@ -158,9 +158,10 @@ export function ProjectDetailPage() {
         </div>
 
         {/* ── Right sidebar ── */}
-        <div className="lg:col-span-4 sticky flex flex-col justify-between top-24 space-y-4 h-full">
+        <div className="lg:col-span-4 sticky flex flex-col justify-between top-24 space-y-6 h-full">
           <ProjectActionCard
             cupos={project.cupos}
+            cuposOcupados={project.cuposOcupados}
             createdAt={project.createdAt}
             isClosed={isClosed}
             hasApplied={hasApplied}

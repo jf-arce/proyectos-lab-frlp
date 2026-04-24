@@ -1,6 +1,7 @@
 import { ArrowRight, CalendarDays, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('es-AR', {
@@ -12,6 +13,7 @@ function formatDate(dateStr: string): string {
 
 interface ProjectActionCardProps {
   cupos: number;
+  cuposOcupados: number;
   createdAt: string;
   isClosed: boolean;
   hasApplied: boolean;
@@ -22,6 +24,7 @@ interface ProjectActionCardProps {
 
 export function ProjectActionCard({
   cupos,
+  cuposOcupados,
   createdAt,
   isClosed,
   hasApplied,
@@ -29,14 +32,29 @@ export function ProjectActionCard({
   fechaCierre,
   onApply,
 }: ProjectActionCardProps) {
+  const cuposDisponibles = cupos - cuposOcupados;
+  const pct = cupos > 0 ? Math.round((cuposOcupados / cupos) * 100) : 0;
+
   return (
     <Card>
       <CardContent className="pt-6 space-y-5">
-        <div className="space-y-1">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
-            Cupos disponibles
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">
+              Cupos ocupados
+            </span>
+            <span className="text-2xl font-black text-foreground">
+              {cuposOcupados}
+              <span className="text-base font-semibold text-muted-foreground">
+                {' '}
+                / {cupos}
+              </span>
+            </span>
+          </div>
+          <Progress value={pct} className="h-2" />
+          <span className="text-[10px] mt-4 font-semibold text-muted-foreground uppercase tracking-widest">
+            {cuposDisponibles} disponibles
           </span>
-          <p className="text-3xl font-black text-foreground">{cupos}</p>
         </div>
 
         <div className="border-t border-border" />

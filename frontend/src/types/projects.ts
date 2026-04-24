@@ -39,6 +39,7 @@ export interface ProjectDetail {
   descripcion: string;
   estado: 'ACTIVO' | 'CERRADO';
   cupos: number;
+  cuposOcupados: number;
   duracion: string | null;
   fechaCierre: string | null;
   createdAt: string;
