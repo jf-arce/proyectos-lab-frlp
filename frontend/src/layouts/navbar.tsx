@@ -1,4 +1,4 @@
-import { Bell, ChevronDown, Moon, Sun } from 'lucide-react';
+import { Bell, ChevronDown, Moon, Sun, UserPlus } from 'lucide-react';
 import { NavLink } from 'react-router';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,6 +18,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
+import { AddResponsableDialog } from '@/pages/responsable/components/add-responsable-dialog';
 
 const navLinks = [
   { to: '/alumno/dashboard', label: 'Inicio' },
@@ -28,6 +30,7 @@ const navLinks = [
 export function Navbar() {
   const { user, logout } = useAuth();
   const { resolvedTheme, setTheme } = useTheme();
+  const [isAddResponsableOpen, setIsAddResponsableOpen] = useState(false);
   const initials = user
     ? (user.nombre[0] + user.apellido[0]).toUpperCase()
     : '?';
@@ -94,6 +97,10 @@ export function Navbar() {
               <DropdownMenuGroup>
                 <DropdownMenuItem>Mi perfil</DropdownMenuItem>
                 <DropdownMenuItem>Mis postulaciones</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIsAddResponsableOpen(true)}>
+                  <UserPlus className="mr-2 size-4" />
+                  Agregar responsable
+                </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuSub>
@@ -129,6 +136,10 @@ export function Navbar() {
           </DropdownMenu>
         </div>
       </div>
+      <AddResponsableDialog 
+        open={isAddResponsableOpen} 
+        onOpenChange={setIsAddResponsableOpen} 
+      />
     </header>
   );
 }

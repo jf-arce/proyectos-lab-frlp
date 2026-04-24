@@ -31,14 +31,21 @@ interface AuthenticatedRequest extends Request {
 }
 
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.ALUMNO)
+@Roles(UserRole.ALUMNO, UserRole.RESPONSABLE_LABORATORIO)
 @Controller('profile')
 export class AlumnoController {
   constructor(private readonly alumnoService: AlumnoService) {}
 
   @Get('me')
+  @Roles(UserRole.ALUMNO)
   getProfile(@Req() req: AuthenticatedRequest): Promise<Alumno> {
     return this.alumnoService.findByUserId(req.user.userId);
+  }
+
+  @Get(':id')
+  @Roles(UserRole.RESPONSABLE_LABORATORIO)
+  getAlumnoById(@Param('id', ParseUUIDPipe) id: string): Promise<Alumno> {
+    return this.alumnoService.findById(id);
   }
 
   @Put('me')

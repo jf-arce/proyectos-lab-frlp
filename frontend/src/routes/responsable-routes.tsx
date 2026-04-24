@@ -4,6 +4,7 @@ import { ResponsableDashboardPage } from '@/pages/responsable/dashboard-page';
 import { LaboratorioPage } from '@/pages/responsable/laboratorio-page';
 import { ProjectPostulacionesPage } from '@/pages/responsable/project-postulaciones-page';
 import { ProjectCreatePage } from '@/pages/responsable/project-create-page';
+import { AlumnoProfileView } from '@/pages/responsable/alumno-profile-view';
 import { LabLayout } from '@/layouts/lab-layout';
 
 export const responsableRoutes = [
@@ -25,6 +26,10 @@ export const responsableRoutes = [
           {
             path: '/responsable/proyectos/:id/postulaciones',
             element: <ProjectPostulacionesPage />,
+          },
+          {
+            path: '/responsable/alumnos/:id',
+            element: <AlumnoProfileView />,
           },
         ],
       },
