@@ -26,28 +26,38 @@ El alumno puede ver y editar los siguientes campos:
 
 ### Endpoints
 
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| `GET` | `/profile/me` | Obtiene el perfil del alumno autenticado |
-| `GET` | `/profile/:id` | Obtiene el perfil de un alumno específico (uso del responsable) |
-| `PUT` | `/profile/me` | Actualiza los datos del perfil |
-| `POST` | `/profile/me/skills` | Agrega habilidades al perfil |
-| `DELETE` | `/profile/me/skills/:skillId` | Elimina una habilidad del perfil |
+| Método | Ruta | Roles permitidos | Descripción |
+|--------|------|-----------------|-------------|
+| `GET` | `/profile/me` | `ALUMNO` | Obtiene el perfil del alumno autenticado |
+| `GET` | `/profile/:id` | `RESPONSABLE_LABORATORIO` | Obtiene el perfil de un alumno específico (solo lectura) |
+| `PUT` | `/profile/me` | `ALUMNO`, `RESPONSABLE_LABORATORIO` | Actualiza los datos del propio perfil |
+| `POST` | `/profile/me/skills` | `ALUMNO`, `RESPONSABLE_LABORATORIO` | Agrega una habilidad al perfil (por ID o creando una nueva) |
+| `DELETE` | `/profile/me/skills/:skillId` | `ALUMNO`, `RESPONSABLE_LABORATORIO` | Elimina una habilidad del perfil |
 
-Los endpoints de edición requieren rol `ALUMNO`. El endpoint `GET /profile/:id` permite acceso tanto a `ALUMNO` (propio) como a `RESPONSABLE_LABORATORIO` para la revisión de candidatos.
+Todos los endpoints están protegidos con `JwtAuthGuard` y `RolesGuard`. Tanto el alumno como el responsable pueden ver y editar su propio perfil; `GET /profile/:id` es exclusivo para que el responsable evalúe candidatos.
+
+#### Body de `POST /profile/me/skills` (`AddSkillDto`)
+
+Se debe enviar exactamente una de las dos opciones:
+
+- **Agregar skill existente:** `{ "skillId": "<uuid>" }`
+- **Crear skill nueva:** `{ "nombre": "TypeScript", "categoria": "Programación" }` (`categoria` es opcional)
+
+La validación de que al menos uno de los dos campos esté presente se realiza en el servicio.
 
 ## Estructura de código sugerida
 
-### Backend — `src/modules/alumnos/`
+### Backend — `src/modules/alumno/`
 
 ```
-alumnos/
-├── alumnos.module.ts
-├── alumnos.controller.ts
-├── alumnos.service.ts
+alumno/
+├── alumno.module.ts
+├── alumno.controller.ts
+├── alumno.service.ts
 ├── entities/
 │   └── alumno.entity.ts   # relación 1:1 con User
 └── dto/
+    ├── create-alumno.dto.ts
     └── update-alumno.dto.ts
 ```
 
@@ -106,16 +116,47 @@ components/profile/
 
 ## Entidad compartida: `Skill`
 
-Las habilidades son entidades propias del sistema usadas tanto por alumnos (perfil) como por proyectos (requisitos). Conviene colocarlas en un módulo propio o en un módulo compartido (`skills`):
+Las habilidades son entidades propias del sistema usadas tanto por alumnos (perfil) como por proyectos (requisitos). Están en su propio módulo:
 
 ```
 src/modules/skills/
 ├── skills.module.ts
-├── skills.controller.ts     # GET /skills (listar todas, para autocompletado)
+├── skills.controller.ts     # GET /skills · POST /skills
 ├── skills.service.ts
 └── entities/
-    └── skill.entity.ts      # { id, name, category? }
+    └── skill.entity.ts
 ```
+
+### Entidad `Skill`
+
+```typescript
+@Entity()
+export class Skill {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  nombre: string;
+
+  @Column({ nullable: true })
+  categoria: string | null;
+
+  @Column({ default: false })
+  esPredefinida: boolean;       // true = skill del sistema; false = creada por un alumno
+
+  @Column({ nullable: true })
+  creadaPorAlumnoId: string | null;  // UUID del alumno que la creó (si aplica)
+}
+```
+
+### Endpoints de skills
+
+| Método | Ruta | Guards | Descripción |
+|--------|------|--------|-------------|
+| `GET` | `/skills` | `JwtAuthGuard` | Lista todas las skills (para autocompletado en la UI) |
+| `POST` | `/skills` | `JwtAuthGuard` | Crea una skill nueva (sin restricción de rol) |
+
+Las skills creadas vía `POST /skills` se marcan con `esPredefinida: false` y `creadaPorAlumnoId: null`. Las creadas al agregar una skill nueva al perfil (`POST /profile/me/skills` con `nombre`) quedan asociadas al alumno que las creó.
 
 ## Consideraciones
 
