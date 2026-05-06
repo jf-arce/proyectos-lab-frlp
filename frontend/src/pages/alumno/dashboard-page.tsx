@@ -1,26 +1,18 @@
-import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
-import { alumnoService, type AlumnoProfile } from '@/services/alumno';
+import { usePerfilContext } from '@/context/perfil-context';
 import { AlumnoProfileSidebar } from './components/alumno-profile-sidebar';
 import { RecommendedProjectsSection } from './components/recommended-projects-section';
 import { ExploreProjectsSection } from './components/explore-projects-section';
 
 export function AlumnoDashboardPage() {
-  const { user, token } = useAuth();
-  const [profile, setProfile] = useState<AlumnoProfile | null>(null);
+  const { user } = useAuth();
+  const { profile } = usePerfilContext();
 
-  const displayName = user ? `${user.nombre} ${user.apellido}` : 'Alumno';
-  const initials = user
-    ? `${user.nombre[0]}${user.apellido[0]}`.toUpperCase()
-    : 'A';
-
-  useEffect(() => {
-    if (!token) return;
-    alumnoService
-      .getMyProfile(token)
-      .then(setProfile)
-      .catch(() => null);
-  }, [token]);
+  const nombre = profile?.nombre ?? user?.nombre ?? '';
+  const apellido = profile?.apellido ?? user?.apellido ?? '';
+  const displayName = nombre && apellido ? `${nombre} ${apellido}` : 'Alumno';
+  const initials =
+    nombre && apellido ? `${nombre[0]}${apellido[0]}`.toUpperCase() : 'A';
 
   return (
     <div className="space-y-10 grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 items-start">

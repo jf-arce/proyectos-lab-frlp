@@ -5,9 +5,10 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/use-auth';
-import { alumnoService, type AlumnoProfile } from '@/services/alumno';
+import { alumnoService } from '@/services/alumno';
 import { skillsService, type Skill } from '@/services/skills';
 import { useComboboxAnchor } from '@/components/ui/combobox';
+import { usePerfilContext } from '@/context/perfil-context';
 
 export const perfilSchema = z.object({
   nombre: z.string().min(2, 'Mínimo 2 caracteres'),
@@ -15,7 +16,7 @@ export const perfilSchema = z.object({
   legajo: z.string().min(1, 'El legajo es obligatorio'),
   anioEnCurso: z.string().min(1, 'Seleccioná un año'),
   bio: z.string().min(20, 'La bio debe tener al menos 20 caracteres'),
-  cvUrl: z.string().url('Ingresá una URL válida').optional().or(z.literal('')),
+  cvUrl: z.url('Ingresá una URL válida').optional().or(z.literal('')),
   skills: z.array(z.string()).min(1, 'Agregá al menos una habilidad'),
 });
 
@@ -24,10 +25,9 @@ export type PerfilFormValues = z.infer<typeof perfilSchema>;
 export function usePerfilAlumno() {
   const { token } = useAuth();
   const navigate = useNavigate();
+  const { profile, loadingProfile, refreshProfile } = usePerfilContext();
 
-  const [profile, setProfile] = useState<AlumnoProfile | null>(null);
   const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
-  const [loadingProfile, setLoadingProfile] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [newSkillInput, setNewSkillInput] = useState('');
   const skillAnchor = useComboboxAnchor();
@@ -47,28 +47,33 @@ export function usePerfilAlumno() {
     },
   });
 
-  const selectedSkillNames = useWatch({ control: form.control, name: 'skills' });
+  const selectedSkillNames = useWatch({
+    control: form.control,
+    name: 'skills',
+  });
   const allSkillNames = availableSkills.map((s) => s.nombre);
 
   useEffect(() => {
     if (!token) return;
-    Promise.all([alumnoService.getMyProfile(token), skillsService.findAll(token)])
-      .then(([p, skills]) => {
-        setProfile(p);
-        setAvailableSkills(skills);
-        form.reset({
-          nombre: p.nombre,
-          apellido: p.apellido,
-          legajo: p.legajo,
-          anioEnCurso: String(p.anioEnCurso),
-          bio: p.bio ?? '',
-          cvUrl: p.cvUrl ?? '',
-          skills: p.skills.map((s) => s.nombre),
-        });
-      })
-      .catch(() => toast.error('Error al cargar el perfil'))
-      .finally(() => setLoadingProfile(false));
-  }, [token, form]);
+    skillsService
+      .findAll(token)
+      .then(setAvailableSkills)
+      .catch(() => null);
+  }, [token]);
+
+  useEffect(() => {
+    if (!profile) return;
+    form.reset({
+      nombre: profile.nombre,
+      apellido: profile.apellido,
+      legajo: profile.legajo,
+      anioEnCurso: String(profile.anioEnCurso),
+      bio: profile.bio ?? '',
+      cvUrl: profile.cvUrl ?? '',
+      skills: profile.skills.map((s) => s.nombre),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile]);
 
   async function onSubmit(values: PerfilFormValues) {
     if (!token) return;
@@ -93,7 +98,8 @@ export function usePerfilAlumno() {
 
       for (const name of toAdd) {
         const existing = availableSkills.find((s) => s.nombre === name);
-        if (existing) await alumnoService.addSkill({ skillId: existing.id }, token);
+        if (existing)
+          await alumnoService.addSkill({ skillId: existing.id }, token);
         else await alumnoService.addSkill({ nombre: name }, token);
       }
       for (const name of toRemove) {
@@ -102,12 +108,11 @@ export function usePerfilAlumno() {
       }
 
       toast.success('Perfil actualizado');
+      await refreshProfile();
 
       if (isOnboarding) {
         navigate('/alumno/dashboard', { replace: true });
       } else {
-        const updated = await alumnoService.getMyProfile(token);
-        setProfile(updated);
         setIsEditing(false);
       }
     } catch (err) {
