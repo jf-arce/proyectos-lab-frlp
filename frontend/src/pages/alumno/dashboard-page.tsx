@@ -16,7 +16,10 @@ export function AlumnoDashboardPage() {
 
   useEffect(() => {
     if (!token) return;
-    alumnoService.getMyProfile(token).then(setProfile).catch(() => null);
+    alumnoService
+      .getMyProfile(token)
+      .then(setProfile)
+      .catch(() => null);
   }, [token]);
 
   return (

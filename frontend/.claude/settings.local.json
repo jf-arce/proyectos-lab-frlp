@@ -5,7 +5,9 @@
       "Bash(npx tsc:*)",
       "Bash(npm run *)",
       "Skill(shadcn)",
-      "Bash(xargs grep -l \"perfil\\\\|profile\")"
+      "Bash(xargs grep -l \"perfil\\\\|profile\")",
+      "Bash(Get-ChildItem -Path \"D:\\\\Repositorios\\\\proyectos-lab-frlp\\\\frontend\\\\src\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)"
     ]
   }
 }
