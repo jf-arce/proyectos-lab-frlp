@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { 
-  User, 
-  Mail, 
-  Download, 
+import {
+  User,
+  Mail,
+  Download,
   ArrowLeft,
   Star,
-  Smartphone
+  Smartphone,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -52,7 +52,9 @@ export function AlumnoProfileView() {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">Alumno no encontrado</p>
-        <Button variant="link" onClick={() => navigate(-1)}>Volver atrás</Button>
+        <Button variant="link" onClick={() => navigate(-1)}>
+          Volver atrás
+        </Button>
       </div>
     );
   }
@@ -91,18 +93,28 @@ export function AlumnoProfileView() {
                 </p>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mt-8">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Legajo</p>
-                <p className="text-foreground font-bold text-lg">{alumno.legajo}</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                  Legajo
+                </p>
+                <p className="text-foreground font-bold text-lg">
+                  {alumno.legajo}
+                </p>
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Año</p>
-                <p className="text-foreground font-bold text-lg">{alumno.anioEnCurso}° Nivel</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                  Año
+                </p>
+                <p className="text-foreground font-bold text-lg">
+                  {alumno.anioEnCurso}° Nivel
+                </p>
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Estado</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                  Estado
+                </p>
                 <p className="text-primary font-bold text-lg">Regular</p>
               </div>
             </div>
@@ -126,12 +138,18 @@ export function AlumnoProfileView() {
                 <div className="flex flex-wrap gap-2">
                   {alumno.skills.length > 0 ? (
                     alumno.skills.map((skill) => (
-                      <Badge key={skill.id} variant="secondary" className="px-3 py-1 text-sm font-semibold">
+                      <Badge
+                        key={skill.id}
+                        variant="secondary"
+                        className="px-3 py-1 text-sm font-semibold"
+                      >
                         {skill.nombre}
                       </Badge>
                     ))
                   ) : (
-                    <p className="text-sm text-muted-foreground italic">Sin habilidades registradas</p>
+                    <p className="text-sm text-muted-foreground italic">
+                      Sin habilidades registradas
+                    </p>
                   )}
                 </div>
               </div>
@@ -146,11 +164,15 @@ export function AlumnoProfileView() {
                 <ul className="space-y-4">
                   <li className="flex items-center gap-3 text-sm">
                     <Mail className="size-4 text-muted-foreground" />
-                    <span className="font-medium text-foreground">{alumno.usuario.email}</span>
+                    <span className="font-medium text-foreground">
+                      {alumno.usuario.email}
+                    </span>
                   </li>
                   <li className="flex items-center gap-3 text-sm">
                     <Smartphone className="size-4 text-muted-foreground" />
-                    <span className="font-medium text-foreground">+54 221 444-5566</span>
+                    <span className="font-medium text-foreground">
+                      +54 221 444-5566
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -162,7 +184,9 @@ export function AlumnoProfileView() {
         <div className="lg:col-span-8 space-y-6">
           <Card className="shadow-sm">
             <CardContent className="p-8">
-              <h2 className="text-2xl font-bold text-primary mb-4">Biografía Profesional</h2>
+              <h2 className="text-2xl font-bold text-primary mb-4">
+                Biografía Profesional
+              </h2>
               <div className="text-muted-foreground leading-relaxed space-y-4">
                 {alumno.bio ? (
                   <p>{alumno.bio}</p>
@@ -179,8 +203,12 @@ export function AlumnoProfileView() {
                   <User className="size-8" />
                 </div>
                 <div className="flex-grow text-center md:text-left">
-                  <h4 className="text-lg font-bold text-primary">Curriculum Vitae Académico</h4>
-                  <p className="text-muted-foreground text-sm">Formato PDF actualizado</p>
+                  <h4 className="text-lg font-bold text-primary">
+                    Curriculum Vitae Académico
+                  </h4>
+                  <p className="text-muted-foreground text-sm">
+                    Formato PDF actualizado
+                  </p>
                 </div>
                 <Button className="gap-2 shrink-0">
                   <Download className="size-4" />
