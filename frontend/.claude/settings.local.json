@@ -4,7 +4,8 @@
       "Bash(npx shadcn:*)",
       "Bash(npx tsc:*)",
       "Bash(npm run *)",
-      "Skill(shadcn)"
+      "Skill(shadcn)",
+      "Bash(xargs grep -l \"perfil\\\\|profile\")"
     ]
   }
 }
