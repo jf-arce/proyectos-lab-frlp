@@ -48,7 +48,9 @@ export function AlumnoProfileSidebar({
               Estudiante{anioEnCurso ? ` · ${anioEnCurso}° año` : ''}
             </p>
             {bio && (
-              <p className="text-muted-foreground text-sm line-clamp-3">{bio}</p>
+              <p className="text-muted-foreground text-sm line-clamp-3">
+                {bio}
+              </p>
             )}
           </div>
 

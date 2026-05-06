@@ -48,7 +48,7 @@ export function PerfilView({ profile, userEmail, onEdit }: PerfilViewProps) {
               </Button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mt-8">
+            <div className="flex gap-10 mt-8">
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
                   Legajo
@@ -65,12 +65,6 @@ export function PerfilView({ profile, userEmail, onEdit }: PerfilViewProps) {
                   {profile.anioEnCurso}° Nivel
                 </p>
               </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
-                  Estado
-                </p>
-                <p className="text-primary font-bold text-lg">Regular</p>
-              </div>
             </div>
           </div>
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/3" />
@@ -81,7 +75,7 @@ export function PerfilView({ profile, userEmail, onEdit }: PerfilViewProps) {
         {/* Left: Bio + CV */}
         <div className="lg:col-span-8 space-y-6">
           <Card>
-            <CardContent className="p-8">
+            <CardContent className="px-8 py-6">
               <h2 className="text-2xl font-bold text-primary mb-4">
                 Biografía Profesional
               </h2>
@@ -96,9 +90,9 @@ export function PerfilView({ profile, userEmail, onEdit }: PerfilViewProps) {
               </div>
 
               {/* CV Section */}
-              <div className="mt-12 bg-muted/30 p-8 rounded-xl flex flex-col md:flex-row items-center gap-6 border border-border/50">
-                <div className="w-16 h-16 bg-primary text-primary-foreground flex items-center justify-center rounded-xl">
-                  <FileText className="size-8" />
+              <div className="mt-10 bg-muted/30 p-5 rounded-xl flex flex-col md:flex-row items-center gap-6 border border-border/50">
+                <div className="w-14 h-14 bg-primary text-primary-foreground flex items-center justify-center rounded-xl">
+                  <FileText className="size-7" />
                 </div>
                 <div className="grow text-center md:text-left">
                   <h4 className="text-lg font-bold text-primary">
@@ -132,8 +126,8 @@ export function PerfilView({ profile, userEmail, onEdit }: PerfilViewProps) {
         </div>
 
         {/* Right: Skills + Contact */}
-        <aside className="lg:col-span-4 space-y-8">
-          <Card>
+        <aside className="lg:col-span-4 space-y-8 h-full">
+          <Card className="h-full">
             <CardContent className="p-6 space-y-6">
               <div>
                 <h2 className="text-lg font-bold text-primary flex items-center gap-2 mb-4">

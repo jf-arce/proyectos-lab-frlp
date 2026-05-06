@@ -76,15 +76,17 @@ export function PerfilSkillsField({
             }
           }}
         />
-        <Button
-          type="button"
-          variant="secondary"
-          size="icon"
-          disabled={!newSkillInput.trim()}
-          onClick={onAddCustomSkill}
-        >
-          <Plus className="size-4" />
-        </Button>
+        <div className="flex items-center">
+          <Button
+            className="h-full"
+            type="button"
+            variant="secondary"
+            disabled={!newSkillInput.trim()}
+            onClick={onAddCustomSkill}
+          >
+            <Plus className="size-4" />
+          </Button>
+        </div>
       </div>
     </>
   );
