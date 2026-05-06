@@ -9,12 +9,16 @@ interface AlumnoProfileSidebarProps {
   displayName: string;
   initials: string;
   email?: string;
+  anioEnCurso?: number;
+  bio?: string | null;
 }
 
 export function AlumnoProfileSidebar({
   displayName,
   initials,
   email,
+  anioEnCurso,
+  bio,
 }: AlumnoProfileSidebarProps) {
   return (
     <aside className="lg:sticky top-20.25 self-start mb-0">
@@ -41,13 +45,11 @@ export function AlumnoProfileSidebar({
             <Separator className="my-2" />
 
             <p className="text-muted-foreground text-sm">
-              Estudiante · 5to año
+              Estudiante{anioEnCurso ? ` · ${anioEnCurso}° año` : ''}
             </p>
-            <p className="text-muted-foreground text-sm">
-              Descripcion breve sobre el alumno, intereses y objetivos. Esto
-              ayuda a los laboratorios a entender mejor el perfil del estudiante
-              y recomendar proyectos más relevantes.
-            </p>
+            {bio && (
+              <p className="text-muted-foreground text-sm line-clamp-3">{bio}</p>
+            )}
           </div>
 
           <div className="border-t border-border my-4" />
