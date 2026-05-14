@@ -23,13 +23,13 @@ La plataforma centraliza la publicación de proyectos de laboratorio y la postul
 
 Tabla base de autenticación. Todo usuario del sistema, independientemente de su rol, tiene un registro aquí.
 
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `id` | uuid | Clave primaria |
-| `email` | string | Email único, usado para login |
-| `password` | string | Contraseña hasheada (bcrypt) |
-| `rol` | string | Valores: `ALUMNO`, `RESPONSABLE_LABORATORIO` |
-| `created_at` | timestamp | Fecha de registro |
+| Campo        | Tipo      | Descripción                                  |
+| ------------ | --------- | -------------------------------------------- |
+| `id`         | uuid      | Clave primaria                               |
+| `email`      | string    | Email único, usado para login                |
+| `password`   | string    | Contraseña hasheada (bcrypt)                 |
+| `rol`        | string    | Valores: `ALUMNO`, `RESPONSABLE_LABORATORIO` |
+| `created_at` | timestamp | Fecha de registro                            |
 
 ---
 
@@ -37,13 +37,13 @@ Tabla base de autenticación. Todo usuario del sistema, independientemente de su
 
 Tokens opacos emitidos al hacer login. Se persisten hasheados para validar renovaciones del access token sin requerir un nuevo login.
 
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `id` | uuid | Clave primaria |
-| `usuario_id` | uuid FK | Usuario al que pertenece |
-| `token_hash` | string | Hash bcrypt del token opaco |
-| `expira_en` | timestamp | Fecha de expiración (7 días desde emisión) |
-| `created_at` | timestamp | Fecha de creación |
+| Campo        | Tipo      | Descripción                                |
+| ------------ | --------- | ------------------------------------------ |
+| `id`         | uuid      | Clave primaria                             |
+| `usuario_id` | uuid FK   | Usuario al que pertenece                   |
+| `token_hash` | string    | Hash bcrypt del token opaco                |
+| `expira_en`  | timestamp | Fecha de expiración (7 días desde emisión) |
+| `created_at` | timestamp | Fecha de creación                          |
 
 ---
 
@@ -51,18 +51,18 @@ Tokens opacos emitidos al hacer login. Se persisten hasheados para validar renov
 
 Perfil extendido del usuario con rol `ALUMNO`.
 
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `id` | uuid | Clave primaria |
-| `usuario_id` | uuid FK | Referencia a `USUARIO` |
-| `legajo` | string | Legajo universitario |
-| `nombre` | string | Nombre del alumno |
-| `apellido` | string | Apellido del alumno |
-| `anio_en_curso` | int | Año de la carrera que está cursando |
-| `bio` | string (nullable) | Descripción personal corta (opcional) |
-| `cv_url` | string (nullable) | Link externo al CV (LinkedIn, Drive, etc.) |
-| `cv_archivo_path` | string (nullable) | Ruta del archivo CV subido al servidor |
-| `updated_at` | timestamp | Última actualización del perfil |
+| Campo             | Tipo              | Descripción                                |
+| ----------------- | ----------------- | ------------------------------------------ |
+| `id`              | uuid              | Clave primaria                             |
+| `usuario_id`      | uuid FK           | Referencia a `USUARIO`                     |
+| `legajo`          | string            | Legajo universitario                       |
+| `nombre`          | string            | Nombre del alumno                          |
+| `apellido`        | string            | Apellido del alumno                        |
+| `anio_en_curso`   | int               | Año de la carrera que está cursando        |
+| `bio`             | string (nullable) | Descripción personal corta (opcional)      |
+| `cv_url`          | string (nullable) | Link externo al CV (LinkedIn, Drive, etc.) |
+| `cv_archivo_path` | string (nullable) | Ruta del archivo CV subido al servidor     |
+| `updated_at`      | timestamp         | Última actualización del perfil            |
 
 ---
 
@@ -70,13 +70,13 @@ Perfil extendido del usuario con rol `ALUMNO`.
 
 Perfil extendido del usuario con rol `RESPONSABLE_LABORATORIO`.
 
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `id` | uuid | Clave primaria |
-| `usuario_id` | uuid FK | Referencia a `USUARIO` |
+| Campo            | Tipo    | Descripción                         |
+| ---------------- | ------- | ----------------------------------- |
+| `id`             | uuid    | Clave primaria                      |
+| `usuario_id`     | uuid FK | Referencia a `USUARIO`              |
 | `laboratorio_id` | uuid FK | Laboratorio que gestiona (uno solo) |
-| `nombre` | string | Nombre del responsable |
-| `apellido` | string | Apellido del responsable |
+| `nombre`         | string  | Nombre del responsable              |
+| `apellido`       | string  | Apellido del responsable            |
 
 ---
 
@@ -84,12 +84,12 @@ Perfil extendido del usuario con rol `RESPONSABLE_LABORATORIO`.
 
 Representa cada laboratorio de la facultad que publica proyectos en la plataforma.
 
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `id` | uuid | Clave primaria |
-| `nombre` | string | Nombre del laboratorio (ej: LINSI) |
-| `descripcion` | string | Descripción general del laboratorio |
-| `email_contacto` | string (nullable) | Email de contacto del laboratorio |
+| Campo            | Tipo              | Descripción                         |
+| ---------------- | ----------------- | ----------------------------------- |
+| `id`             | uuid              | Clave primaria                      |
+| `nombre`         | string            | Nombre del laboratorio (ej: LINSI)  |
+| `descripcion`    | string            | Descripción general del laboratorio |
+| `email_contacto` | string (nullable) | Email de contacto del laboratorio   |
 
 ---
 
@@ -97,18 +97,18 @@ Representa cada laboratorio de la facultad que publica proyectos en la plataform
 
 Proyecto publicado por un laboratorio al cual los alumnos pueden postularse.
 
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `id` | uuid | Clave primaria |
-| `laboratorio_id` | uuid FK | Laboratorio que lo publica |
-| `titulo` | string | Título del proyecto |
-| `descripcion` | string | Descripción detallada |
-| `estado` | string | Valores: `ACTIVO`, `CERRADO` |
-| `cupos` | int | Número de cupos disponibles (default 0) |
-| `duracion` | string (nullable) | Duración estimada del proyecto |
-| `fecha_cierre` | date (nullable) | Fecha de cierre de postulaciones |
-| `created_at` | timestamp | Fecha de publicación |
-| `updated_at` | timestamp | Última modificación |
+| Campo            | Tipo              | Descripción                             |
+| ---------------- | ----------------- | --------------------------------------- |
+| `id`             | uuid              | Clave primaria                          |
+| `laboratorio_id` | uuid FK           | Laboratorio que lo publica              |
+| `titulo`         | string            | Título del proyecto                     |
+| `descripcion`    | string            | Descripción detallada                   |
+| `estado`         | string            | Valores: `ACTIVO`, `CERRADO`            |
+| `cupos`          | int               | Número de cupos disponibles (default 0) |
+| `duracion`       | string (nullable) | Duración estimada del proyecto          |
+| `fecha_cierre`   | date (nullable)   | Fecha de cierre de postulaciones        |
+| `created_at`     | timestamp         | Fecha de publicación                    |
+| `updated_at`     | timestamp         | Última modificación                     |
 
 ---
 
@@ -116,13 +116,13 @@ Proyecto publicado por un laboratorio al cual los alumnos pueden postularse.
 
 Catálogo de habilidades técnicas y blandas. Incluye tanto las predefinidas por el sistema como las creadas por alumnos.
 
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `id` | uuid | Clave primaria |
-| `nombre` | string | Nombre de la habilidad (ej: Python, SQL) |
-| `categoria` | string (nullable) | Agrupación temática (ej: Lenguajes, Bases de datos) |
-| `es_predefinida` | boolean | `true` si es del catálogo del sistema, `false` si la creó un alumno |
-| `creada_por_alumno_id` | uuid FK (nullable) | Referencia al alumno que la creó; null si es predefinida |
+| Campo                  | Tipo               | Descripción                                                         |
+| ---------------------- | ------------------ | ------------------------------------------------------------------- |
+| `id`                   | uuid               | Clave primaria                                                      |
+| `nombre`               | string             | Nombre de la habilidad (ej: Python, SQL)                            |
+| `categoria`            | string (nullable)  | Agrupación temática (ej: Lenguajes, Bases de datos)                 |
+| `es_predefinida`       | boolean            | `true` si es del catálogo del sistema, `false` si la creó un alumno |
+| `creada_por_alumno_id` | uuid FK (nullable) | Referencia al alumno que la creó; null si es predefinida            |
 
 > Los responsables de laboratorio solo pueden seleccionar skills del catálogo predefinido (`es_predefinida = true`) al definir los requisitos de un proyecto.
 
@@ -132,10 +132,10 @@ Catálogo de habilidades técnicas y blandas. Incluye tanto las predefinidas por
 
 Tabla pivote. Registra las habilidades declaradas por cada alumno en su perfil.
 
-| Campo | Tipo | Descripción |
-|---|---|---|
+| Campo       | Tipo    | Descripción           |
+| ----------- | ------- | --------------------- |
 | `alumno_id` | uuid FK | Referencia a `ALUMNO` |
-| `skill_id` | uuid FK | Referencia a `SKILL` |
+| `skill_id`  | uuid FK | Referencia a `SKILL`  |
 
 ---
 
@@ -143,10 +143,10 @@ Tabla pivote. Registra las habilidades declaradas por cada alumno en su perfil.
 
 Tabla pivote. Registra las habilidades requeridas por cada proyecto.
 
-| Campo | Tipo | Descripción |
-|---|---|---|
+| Campo         | Tipo    | Descripción             |
+| ------------- | ------- | ----------------------- |
 | `proyecto_id` | uuid FK | Referencia a `PROYECTO` |
-| `skill_id` | uuid FK | Referencia a `SKILL` |
+| `skill_id`    | uuid FK | Referencia a `SKILL`    |
 
 > La intersección entre `ALUMNO_SKILL` y `PROYECTO_SKILL` es la base del algoritmo de matching: el score de compatibilidad se calcula comparando los `skill_id` del alumno contra los del proyecto.
 
@@ -156,14 +156,14 @@ Tabla pivote. Registra las habilidades requeridas por cada proyecto.
 
 Registra la postulación de un alumno a un proyecto.
 
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `id` | uuid | Clave primaria |
-| `alumno_id` | uuid FK | Alumno que se postula |
-| `proyecto_id` | uuid FK | Proyecto al que se postula |
-| `estado` | string | Valores: `PENDIENTE`, `ACEPTADA`, `RECHAZADA` |
-| `created_at` | timestamp | Fecha de postulación |
-| `updated_at` | timestamp | Última actualización de estado |
+| Campo         | Tipo      | Descripción                                   |
+| ------------- | --------- | --------------------------------------------- |
+| `id`          | uuid      | Clave primaria                                |
+| `alumno_id`   | uuid FK   | Alumno que se postula                         |
+| `proyecto_id` | uuid FK   | Proyecto al que se postula                    |
+| `estado`      | string    | Valores: `PENDIENTE`, `ACEPTADA`, `RECHAZADA` |
+| `created_at`  | timestamp | Fecha de postulación                          |
+| `updated_at`  | timestamp | Última actualización de estado                |
 
 > La lógica de repostulación (permitir volver a postularse luego de un rechazo pasado cierto tiempo) se implementa en el backend. La base de datos no impone restricción de unicidad sobre `(alumno_id, proyecto_id)`.
 
@@ -173,37 +173,37 @@ Registra la postulación de un alumno a un proyecto.
 
 Registra los eventos relevantes generados para cada usuario. Soporta tanto visualización in-app como envío por email.
 
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `id` | uuid | Clave primaria |
-| `usuario_id` | uuid FK | Usuario destinatario |
-| `postulacion_id` | uuid FK (nullable) | Postulación que originó la notificación |
-| `tipo` | string | Ej: `NUEVA_POSTULACION`, `ESTADO_ACTUALIZADO` |
-| `mensaje` | string | Texto de la notificación |
-| `leida` | boolean | Si el usuario la leyó in-app |
-| `email_enviado` | boolean | Si el email fue despachado exitosamente |
-| `created_at` | timestamp | Fecha de creación |
+| Campo            | Tipo               | Descripción                                   |
+| ---------------- | ------------------ | --------------------------------------------- |
+| `id`             | uuid               | Clave primaria                                |
+| `usuario_id`     | uuid FK            | Usuario destinatario                          |
+| `postulacion_id` | uuid FK (nullable) | Postulación que originó la notificación       |
+| `tipo`           | string             | Ej: `NUEVA_POSTULACION`, `ESTADO_ACTUALIZADO` |
+| `mensaje`        | string             | Texto de la notificación                      |
+| `leida`          | boolean            | Si el usuario la leyó in-app                  |
+| `email_enviado`  | boolean            | Si el email fue despachado exitosamente       |
+| `created_at`     | timestamp          | Fecha de creación                             |
 
 ---
 
 ## Relaciones
 
-| Relación | Cardinalidad | Descripción |
-|---|---|---|
-| `USUARIO` → `REFRESH_TOKEN` | 1:N | Un usuario puede tener varios refresh tokens activos |
-| `USUARIO` → `ALUMNO` | 1:0..1 | Un usuario puede tener perfil de alumno |
-| `USUARIO` → `RESPONSABLE_LABORATORIO` | 1:0..1 | Un usuario puede ser responsable de laboratorio |
-| `LABORATORIO` → `RESPONSABLE_LABORATORIO` | 1:N | Un laboratorio tiene uno o más responsables |
-| `LABORATORIO` → `PROYECTO` | 1:N | Un laboratorio publica varios proyectos |
-| `ALUMNO` → `POSTULACION` | 1:N | Un alumno realiza varias postulaciones |
-| `PROYECTO` → `POSTULACION` | 1:N | Un proyecto recibe varias postulaciones |
-| `ALUMNO` → `ALUMNO_SKILL` | 1:N | Un alumno declara varias habilidades |
-| `SKILL` → `ALUMNO_SKILL` | 1:N | Una skill puede estar en varios perfiles |
-| `PROYECTO` → `PROYECTO_SKILL` | 1:N | Un proyecto requiere varias habilidades |
-| `SKILL` → `PROYECTO_SKILL` | 1:N | Una skill puede requerirse en varios proyectos |
-| `USUARIO` → `NOTIFICACION` | 1:N | Un usuario recibe varias notificaciones |
-| `POSTULACION` → `NOTIFICACION` | 1:N | Una postulación puede generar varias notificaciones |
-| `ALUMNO` → `SKILL` | 1:N | Un alumno puede crear skills personalizadas |
+| Relación                                  | Cardinalidad | Descripción                                          |
+| ----------------------------------------- | ------------ | ---------------------------------------------------- |
+| `USUARIO` → `REFRESH_TOKEN`               | 1:N          | Un usuario puede tener varios refresh tokens activos |
+| `USUARIO` → `ALUMNO`                      | 1:0..1       | Un usuario puede tener perfil de alumno              |
+| `USUARIO` → `RESPONSABLE_LABORATORIO`     | 1:0..1       | Un usuario puede ser responsable de laboratorio      |
+| `LABORATORIO` → `RESPONSABLE_LABORATORIO` | 1:N          | Un laboratorio tiene uno o más responsables          |
+| `LABORATORIO` → `PROYECTO`                | 1:N          | Un laboratorio publica varios proyectos              |
+| `ALUMNO` → `POSTULACION`                  | 1:N          | Un alumno realiza varias postulaciones               |
+| `PROYECTO` → `POSTULACION`                | 1:N          | Un proyecto recibe varias postulaciones              |
+| `ALUMNO` → `ALUMNO_SKILL`                 | 1:N          | Un alumno declara varias habilidades                 |
+| `SKILL` → `ALUMNO_SKILL`                  | 1:N          | Una skill puede estar en varios perfiles             |
+| `PROYECTO` → `PROYECTO_SKILL`             | 1:N          | Un proyecto requiere varias habilidades              |
+| `SKILL` → `PROYECTO_SKILL`                | 1:N          | Una skill puede requerirse en varios proyectos       |
+| `USUARIO` → `NOTIFICACION`                | 1:N          | Un usuario recibe varias notificaciones              |
+| `POSTULACION` → `NOTIFICACION`            | 1:N          | Una postulación puede generar varias notificaciones  |
+| `ALUMNO` → `SKILL`                        | 1:N          | Un alumno puede crear skills personalizadas          |
 
 ---
 
