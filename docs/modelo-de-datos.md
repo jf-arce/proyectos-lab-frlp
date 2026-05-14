@@ -104,6 +104,9 @@ Proyecto publicado por un laboratorio al cual los alumnos pueden postularse.
 | `titulo` | string | Título del proyecto |
 | `descripcion` | string | Descripción detallada |
 | `estado` | string | Valores: `ACTIVO`, `CERRADO` |
+| `cupos` | int | Número de cupos disponibles (default 0) |
+| `duracion` | string (nullable) | Duración estimada del proyecto |
+| `fecha_cierre` | date (nullable) | Fecha de cierre de postulaciones |
 | `created_at` | timestamp | Fecha de publicación |
 | `updated_at` | timestamp | Última modificación |
 
@@ -117,7 +120,7 @@ Catálogo de habilidades técnicas y blandas. Incluye tanto las predefinidas por
 |---|---|---|
 | `id` | uuid | Clave primaria |
 | `nombre` | string | Nombre de la habilidad (ej: Python, SQL) |
-| `categoria` | string | Agrupación temática (ej: Lenguajes, Bases de datos) |
+| `categoria` | string (nullable) | Agrupación temática (ej: Lenguajes, Bases de datos) |
 | `es_predefinida` | boolean | `true` si es del catálogo del sistema, `false` si la creó un alumno |
 | `creada_por_alumno_id` | uuid FK (nullable) | Referencia al alumno que la creó; null si es predefinida |
 
@@ -174,7 +177,7 @@ Registra los eventos relevantes generados para cada usuario. Soporta tanto visua
 |---|---|---|
 | `id` | uuid | Clave primaria |
 | `usuario_id` | uuid FK | Usuario destinatario |
-| `postulacion_id` | uuid FK | Postulación que originó la notificación |
+| `postulacion_id` | uuid FK (nullable) | Postulación que originó la notificación |
 | `tipo` | string | Ej: `NUEVA_POSTULACION`, `ESTADO_ACTUALIZADO` |
 | `mensaje` | string | Texto de la notificación |
 | `leida` | boolean | Si el usuario la leyó in-app |
@@ -212,3 +215,4 @@ Registra los eventos relevantes generados para cada usuario. Soporta tanto visua
 - El campo `creada_por_alumno_id` en `SKILL` es nullable. Es null para todas las skills predefinidas del catálogo y apunta al alumno creador solo para skills personalizadas.
 - Los archivos de CV subidos al servidor se almacenan en el sistema de archivos local del servidor. La ruta relativa se persiste en `cv_archivo_path`.
 - El algoritmo de matching compara los `skill_id` registrados en `ALUMNO_SKILL` contra los de `PROYECTO_SKILL` para calcular un score de compatibilidad por proyecto.
+- El campo `postulacion_id` en `NOTIFICACION` es nullable. Si la postulación asociada es eliminada, el campo se pone en `null` (ON DELETE SET NULL) para preservar el historial de la notificación.
