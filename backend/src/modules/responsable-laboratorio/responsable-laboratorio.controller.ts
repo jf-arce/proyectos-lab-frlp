@@ -1,8 +1,9 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Body, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResponsableLaboratorioService } from './responsable-laboratorio.service';
 import { JwtAuthGuard } from '@/modules/auth/jwt-auth.guard';
 import { UserRole } from '@/modules/users/entities/user.entity';
+import { UpdateResponsableDto } from './dto/update-responsable.dto';
 import { Request } from 'express';
 
 interface AuthenticatedRequest extends Request {
@@ -25,5 +26,12 @@ export class ResponsableLaboratorioController {
   @ApiResponse({ status: 200, description: 'Perfil obtenido exitosamente' })
   async getMe(@Req() req: AuthenticatedRequest) {
     return this.responsableService.findByUsuarioId(req.user.userId);
+  }
+
+  @Patch('me')
+  @ApiOperation({ summary: 'Actualizar el perfil del responsable logueado' })
+  @ApiResponse({ status: 200, description: 'Perfil actualizado exitosamente' })
+  async update(@Req() req: AuthenticatedRequest, @Body() dto: UpdateResponsableDto) {
+    return this.responsableService.update(req.user.userId, dto);
   }
 }

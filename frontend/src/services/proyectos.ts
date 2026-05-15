@@ -22,6 +22,10 @@ export interface Proyecto {
   updatedAt?: string;
   postulaciones?: Postulacion[];
   skills?: { id: string; nombre: string; categoria?: string }[];
+  laboratorio?: {
+    id: string;
+    nombre: string;
+  };
 }
 
 export const proyectosService = {

@@ -33,6 +33,7 @@ interface ProjectFiltersBarProps {
   onSearchChange: (value: string) => void;
   onLabChange: (value: string) => void;
   onSkillsChange: (skills: string[]) => void;
+  hideLab?: boolean;
 }
 
 export function ProjectFiltersBar({
@@ -44,11 +45,18 @@ export function ProjectFiltersBar({
   onSearchChange,
   onLabChange,
   onSkillsChange,
+  hideLab = false,
 }: ProjectFiltersBarProps) {
   const anchor = useComboboxAnchor();
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <div
+      className={
+        hideLab
+          ? 'grid grid-cols-1 md:grid-cols-2 gap-4 mb-8'
+          : 'grid grid-cols-1 md:grid-cols-3 gap-4 mb-8'
+      }
+    >
       <div className="space-y-1.5">
         <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
           Buscar por palabras clave
@@ -65,26 +73,28 @@ export function ProjectFiltersBar({
         </InputGroup>
       </div>
 
-      <div className="space-y-1.5">
-        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-          Laboratorio
-        </label>
-        <Select value={selectedLab} onValueChange={onLabChange}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Todos" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="all">Todos</SelectItem>
-              {labOptions.map((lab) => (
-                <SelectItem key={lab} value={lab}>
-                  {lab}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
+      {!hideLab && (
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+            Laboratorio
+          </label>
+          <Select value={selectedLab} onValueChange={onLabChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Todos" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="all">Todos</SelectItem>
+                {labOptions.map((lab) => (
+                  <SelectItem key={lab} value={lab}>
+                    {lab}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       <div className="space-y-1.5">
         <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">

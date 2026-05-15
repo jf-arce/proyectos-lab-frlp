@@ -1,5 +1,5 @@
-import { Bell, ChevronDown, Moon, Sun, UserPlus } from 'lucide-react';
-import { NavLink } from 'react-router';
+import { Bell, ChevronDown, Moon, Sun, UserPlus, User } from 'lucide-react';
+import { NavLink, Link } from 'react-router';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
+import { Role } from '@/types/auth';
 import { useTheme } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -95,7 +96,19 @@ export function Navbar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
               <DropdownMenuGroup>
-                <DropdownMenuItem>Mi perfil</DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    to={
+                      user?.role === Role.ALUMNO
+                        ? '/alumno/perfil'
+                        : '/responsable/perfil'
+                    }
+                    className="flex items-center"
+                  >
+                    <User className="mr-2 size-4" />
+                    Mi perfil
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem>Mis postulaciones</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setIsAddResponsableOpen(true)}>
                   <UserPlus className="mr-2 size-4" />

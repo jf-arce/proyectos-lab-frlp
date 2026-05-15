@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Outlet, NavLink } from 'react-router';
+import { Outlet, NavLink, Link } from 'react-router';
 import { 
   LayoutDashboard, 
   PlusCircle, 
@@ -118,9 +118,11 @@ export function LabLayout() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" side="top" className="w-56" sideOffset={10}>
               <DropdownMenuGroup>
-                <DropdownMenuItem className="gap-2">
-                  <User className="size-4" />
-                  Mi perfil
+                <DropdownMenuItem asChild className="gap-2">
+                  <Link to="/responsable/perfil">
+                    <User className="size-4" />
+                    Mi perfil
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-2" onClick={() => setIsAddResponsableOpen(true)}>
                   <UserPlus className="size-4" />

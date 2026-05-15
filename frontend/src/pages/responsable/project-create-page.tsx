@@ -5,9 +5,7 @@ import {
   BrainCircuit, 
   Calendar, 
   Users, 
-  Hourglass, 
   Plus,
-  Save,
   Send,
   ChevronRight,
   FileText,
@@ -346,15 +344,6 @@ export function ProjectCreatePage() {
               >
                 <Send className="size-4" />
                 {submitting ? 'Publicando...' : 'Publicar Proyecto'}
-              </Button>
-              
-              <Button 
-                variant="outline"
-                type="button"
-                className="h-12 bg-muted/10 text-muted-foreground font-bold rounded-xl border-dashed hover:bg-muted/30 transition-all flex items-center justify-center gap-2"
-              >
-                <Save className="size-4" />
-                Guardar Borrador
               </Button>
             </div>
             <p className="text-[10px] text-center text-muted-foreground mt-4 px-2 leading-relaxed font-semibold uppercase tracking-tighter opacity-70">

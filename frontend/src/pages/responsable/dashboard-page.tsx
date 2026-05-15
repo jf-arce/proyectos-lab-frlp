@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router';
 import { useAuth } from '@/hooks/use-auth';
+import { ProjectFiltersBar } from '../alumno/components/project-filters-bar';
 import {
   Dialog,
   DialogContent,
@@ -49,6 +50,11 @@ export function ResponsableDashboardPage() {
   const [isEditProjectOpen, setIsEditProjectOpen] = useState(false);
   const [applicants, setApplicants] = useState<Postulacion[]>([]);
   const [loadingApplicants, setLoadingApplicants] = useState(false);
+
+  // Filters state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedLab, setSelectedLab] = useState('all');
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
 
   // Edit form state
   const [editTitle, setEditTitle] = useState('');
@@ -189,6 +195,27 @@ export function ResponsableDashboardPage() {
     }
   };
 
+  const filteredProyectos = proyectos.filter((p) => {
+    const matchesSearch =
+      p.titulo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.descripcion.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesLab =
+      selectedLab === 'all' || p.laboratorio?.nombre === selectedLab;
+
+    const matchesSkills =
+      selectedSkills.length === 0 ||
+      selectedSkills.every((s) => p.skills?.some((ps) => ps.nombre === s));
+
+    return matchesSearch && matchesLab && matchesSkills;
+  });
+
+  const labOptions = Array.from(
+    new Set(proyectos.map((p) => p.laboratorio?.nombre).filter(Boolean)),
+  ) as string[];
+
+  const skillOptions = availableSkills.map((s) => s.nombre);
+
   const proyectosActivos = proyectos.filter(
     (p) => p.estado === 'ACTIVO',
   ).length;
@@ -299,13 +326,19 @@ export function ResponsableDashboardPage() {
           <h3 className="text-xl font-bold text-primary tracking-tight">
             Mis Proyectos
           </h3>
-          <div className="relative w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input
-              className="pl-9 bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
-              placeholder="Buscar proyecto..."
-            />
-          </div>
+        </div>
+        <div className="px-8 py-6">
+          <ProjectFiltersBar
+            searchQuery={searchQuery}
+            selectedLab={selectedLab}
+            selectedSkills={selectedSkills}
+            labOptions={labOptions}
+            skillOptions={skillOptions}
+            onSearchChange={setSearchQuery}
+            onLabChange={setSelectedLab}
+            onSkillsChange={setSelectedSkills}
+            hideLab
+          />
         </div>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left">
@@ -326,17 +359,17 @@ export function ResponsableDashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/30">
-              {proyectos.length === 0 ? (
+              {filteredProyectos.length === 0 ? (
                 <tr>
                   <td
                     colSpan={4}
                     className="px-8 py-12 text-center text-muted-foreground italic"
                   >
-                    No hay proyectos para mostrar.
+                    No hay proyectos que coincidan con los filtros.
                   </td>
                 </tr>
               ) : (
-                proyectos.map((proyecto) => {
+                filteredProyectos.map((proyecto) => {
                   const isClosed = proyecto.estado !== 'ACTIVO';
                   const postCount = proyecto.postulaciones?.length || 0;
                   const firstLetters =
