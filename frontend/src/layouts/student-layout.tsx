@@ -6,12 +6,12 @@ import { PerfilProvider } from '@/context/perfil-context';
 export function StudentLayout() {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      <Main>
-        <PerfilProvider>
+      <PerfilProvider>
+        <Navbar />
+        <Main>
           <Outlet />
-        </PerfilProvider>
-      </Main>
+        </Main>
+      </PerfilProvider>
     </div>
   );
 }

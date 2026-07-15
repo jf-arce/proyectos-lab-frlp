@@ -20,6 +20,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { AddResponsableDialog } from '@/pages/responsable/components/add-responsable-dialog';
+import { usePerfilAlumno } from '@/hooks/use-perfil-alumno';
 
 const navLinks = [
   { to: '/alumno/dashboard', label: 'Inicio' },
@@ -34,6 +35,10 @@ export function Navbar() {
   const initials = user
     ? (user.nombre[0] + user.apellido[0]).toUpperCase()
     : '?';
+
+  const { isOnboarding } = usePerfilAlumno();
+
+  if (isOnboarding) return;
 
   return (
     <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-sm shadow-nav border-b border-border/40">
