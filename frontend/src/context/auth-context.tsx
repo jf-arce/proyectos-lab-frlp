@@ -21,11 +21,16 @@ export interface JwtPayload {
   exp?: number;
 }
 
+export interface LoginResult {
+  user: JwtPayload;
+  accessToken: string;
+}
+
 interface AuthContextValue {
   user: JwtPayload | null;
   token: string | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<JwtPayload>;
+  login: (email: string, password: string) => Promise<LoginResult>;
   register: (dto: RegisterDto) => Promise<JwtPayload>;
   logout: () => Promise<void>;
 }
@@ -140,12 +145,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [clearRefreshTimer, scheduleRefresh]);
 
   const login = useCallback(
-    async (email: string, password: string): Promise<JwtPayload> => {
+    async (email: string, password: string): Promise<LoginResult> => {
       const { accessToken, refreshToken } = await authService.login(
         email,
         password,
       );
-      return applyTokens(accessToken, refreshToken);
+      const user = applyTokens(accessToken, refreshToken);
+      return { user, accessToken };
     },
     [applyTokens],
   );

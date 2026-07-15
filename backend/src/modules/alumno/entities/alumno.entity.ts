@@ -1,4 +1,5 @@
 import {
+  AfterLoad,
   Column,
   Entity,
   JoinColumn,
@@ -51,4 +52,11 @@ export class Alumno {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
+
+  isProfileComplete!: boolean;
+
+  @AfterLoad()
+  computeProfileComplete() {
+    this.isProfileComplete = !!(this.bio && this.skills?.length > 0);
+  }
 }

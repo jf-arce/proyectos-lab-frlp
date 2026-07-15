@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { LogIn, UserPlus } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Role } from '@/types/auth';
+import { alumnoService } from '@/services/alumno';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
@@ -31,6 +32,15 @@ function roleHome(role: string) {
     : '/alumno/dashboard';
 }
 
+async function resolveAlumnoHome(accessToken: string): Promise<string> {
+  try {
+    const profile = await alumnoService.getMyProfile(accessToken);
+    return profile.isProfileComplete ? '/alumno/dashboard' : '/alumno/perfil';
+  } catch {
+    return '/alumno/dashboard';
+  }
+}
+
 export function LoginForm() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -42,9 +52,15 @@ export function LoginForm() {
 
   async function onSubmit(values: FormValues) {
     try {
-      const user = await login(values.email, values.password);
+      const { user, accessToken } = await login(values.email, values.password);
       toast.success(`¡Bienvenido, ${user.nombre}!`);
-      navigate(roleHome(user.role), { replace: true });
+
+      if (user.role === Role.ALUMNO) {
+        const destination = await resolveAlumnoHome(accessToken);
+        navigate(destination, { replace: true });
+      } else {
+        navigate(roleHome(user.role), { replace: true });
+      }
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : 'Error al iniciar sesión',

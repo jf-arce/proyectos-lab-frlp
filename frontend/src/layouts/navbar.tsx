@@ -1,5 +1,5 @@
 import { Bell, ChevronDown, Moon, Sun, UserPlus } from 'lucide-react';
-import { NavLink } from 'react-router';
+import { Link, NavLink } from 'react-router';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -20,6 +20,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { AddResponsableDialog } from '@/pages/responsable/components/add-responsable-dialog';
+import { usePerfilAlumno } from '@/hooks/use-perfil-alumno';
 
 const navLinks = [
   { to: '/alumno/dashboard', label: 'Inicio' },
@@ -34,6 +35,10 @@ export function Navbar() {
   const initials = user
     ? (user.nombre[0] + user.apellido[0]).toUpperCase()
     : '?';
+
+  const { isOnboarding } = usePerfilAlumno();
+
+  if (isOnboarding) return;
 
   return (
     <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-sm shadow-nav border-b border-border/40">
@@ -95,7 +100,9 @@ export function Navbar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
               <DropdownMenuGroup>
-                <DropdownMenuItem>Mi perfil</DropdownMenuItem>
+                <Link to="/alumno/perfil">
+                  <DropdownMenuItem>Mi perfil</DropdownMenuItem>
+                </Link>
                 <DropdownMenuItem>Mis postulaciones</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setIsAddResponsableOpen(true)}>
                   <UserPlus className="mr-2 size-4" />

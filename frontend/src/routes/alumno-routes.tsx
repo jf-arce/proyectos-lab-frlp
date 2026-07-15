@@ -6,6 +6,7 @@ import { LaboratoriosPage } from '@/pages/alumno/labs-page';
 import { LaboratorioDetailPage } from '@/pages/alumno/lab-detail-page';
 import { ProjectDetailPage } from '@/pages/alumno/project-detail-page';
 import { PostulacionesPage } from '@/pages/alumno/postulaciones-page';
+import { PerfilPage } from '@/pages/alumno/perfil-page';
 
 export const alumnoRoutes = [
   {
@@ -22,6 +23,7 @@ export const alumnoRoutes = [
           },
           { path: '/alumno/proyecto/:id', element: <ProjectDetailPage /> },
           { path: '/alumno/postulaciones', element: <PostulacionesPage /> },
+          { path: '/alumno/perfil', element: <PerfilPage /> },
         ],
       },
     ],
