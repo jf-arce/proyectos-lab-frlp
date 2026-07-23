@@ -47,9 +47,25 @@ export interface ProjectDetail {
   skills: ProjectSkill[];
 }
 
+export type PostulacionEstado = 'PENDIENTE' | 'ACEPTADA' | 'RECHAZADA';
+
+export interface MyApplicationProject {
+  id: string;
+  titulo: string;
+  descripcion: string;
+  estado: 'ACTIVO' | 'CERRADO';
+  cupos: number;
+  duracion: string | null;
+  fechaCierre: string | null;
+  createdAt: string;
+  laboratorio: ProjectLaboratorio;
+  skills: ProjectSkill[];
+}
+
 export interface MyApplication {
   id: string;
-  estado: 'PENDIENTE' | 'ACEPTADA' | 'RECHAZADA';
+  estado: PostulacionEstado;
   createdAt: string;
-  proyecto: { id: string };
+  updatedAt: string;
+  proyecto: MyApplicationProject;
 }

@@ -103,7 +103,9 @@ export function Navbar() {
                 <Link to="/alumno/perfil">
                   <DropdownMenuItem>Mi perfil</DropdownMenuItem>
                 </Link>
-                <DropdownMenuItem>Mis postulaciones</DropdownMenuItem>
+                <Link to="/alumno/postulaciones">
+                  <DropdownMenuItem>Mis postulaciones</DropdownMenuItem>
+                </Link>
                 <DropdownMenuItem onClick={() => setIsAddResponsableOpen(true)}>
                   <UserPlus className="mr-2 size-4" />
                   Agregar responsable

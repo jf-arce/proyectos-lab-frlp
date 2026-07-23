@@ -21,21 +21,33 @@ Es la cara pública de la plataforma para los alumnos. Permite descubrir todos l
 - Endpoint `GET /projects/:id` (rol `ALUMNO`) que devuelve la información completa: título, descripción, cupo, duracion, laboratorio (nombre, descripción, emailContacto), habilidades requeridas, fecha de publicación.
 - Para determinar si el alumno ya se postuló, el frontend llama en paralelo a `GET /applications/my` y verifica si alguna postulación corresponde al proyecto actual. El endpoint de detalle no incluye `hasApplied` en su respuesta.
 
-### Postulación con un clic
+### Postulación con un clic ✅ (implementado)
 
 - Endpoint `POST /projects/:id/apply` (rol `ALUMNO`).
-- El backend obtiene el perfil completo del alumno desde la BD y crea el registro `Application` vinculado al alumno y al proyecto.
-- Validaciones:
-  - El proyecto debe estar `ACTIVE`.
-  - El alumno no puede postularse dos veces al mismo proyecto (retornar `409 Conflict`).
-  - Verificar que el cupo no esté completo (postulaciones `ACCEPTED` < `capacity`).
-- Tras crear la postulación, disparar notificación al responsable del laboratorio (Módulo 5).
+- El backend obtiene el perfil completo del alumno desde la BD y crea el registro `Postulacion` vinculado al alumno y al proyecto.
+- Validaciones (implementadas en `postulaciones.service.ts` → `postular()`):
+  - El proyecto debe estar `ACTIVO` (si no, `400`).
+  - El alumno no puede postularse dos veces al mismo proyecto (`409 Conflict`).
+  - El cupo no debe estar completo: postulaciones `ACEPTADA` < `cupos` (si está lleno, `400`). **Excepción:** `cupos = 0` se interpreta como "sin límite definido" y no se valida cupo, porque es el default de la entity y el valor de los proyectos existentes.
+- Tras crear la postulación, se dispara la notificación al responsable del laboratorio vía evento `POSTULACION_CREADA` (Módulo 5).
 
-### Historial de postulaciones del alumno
+### Historial de postulaciones del alumno ✅ (implementado)
 
 - Endpoint `GET /applications/my` que lista todas las postulaciones del alumno autenticado.
-- Incluye datos del proyecto (título, laboratorio) y el estado actual (`PENDING`, `ACCEPTED`, `REJECTED`).
-- Ordenado por fecha de postulación descendente.
+- Incluye datos del proyecto (título, laboratorio con `emailContacto`, skills) y el estado actual (`PENDIENTE`, `ACEPTADA`, `RECHAZADA`).
+- Ordenado por fecha de postulación descendente. Sin paginación ni filtros de backend: el frontend filtra client-side (por estado y por texto en título de proyecto / nombre de laboratorio).
+- Frontend: `/alumno/postulaciones` (listado en cards) y `/alumno/postulaciones/:id` (detalle con seguimiento del estado, datos del proyecto, contacto del laboratorio y acción de retirar).
+
+### Detalle de una postulación ✅ (implementado)
+
+- Endpoint `GET /applications/:id` (rol `ALUMNO`) que devuelve una postulación propia con el proyecto completo (laboratorio y skills incluidos).
+- Si la postulación no existe o pertenece a otro alumno, responde `404` (no se revela existencia ajena).
+
+### Retirar postulación ✅ (implementado)
+
+- Endpoint `DELETE /projects/:id/apply` (rol `ALUMNO`), donde `:id` es el id del **proyecto**.
+- Solo se permite mientras la postulación está `PENDIENTE`; en otro estado responde `400`.
+- Es un borrado físico: el alumno puede volver a postularse al mismo proyecto después de retirarse.
 
 ### Endpoints
 
@@ -44,8 +56,9 @@ Es la cara pública de la plataforma para los alumnos. Permite descubrir todos l
 | `GET` | `/projects` | ALUMNO | Listar proyectos activos con filtros |
 | `GET` | `/projects/:id` | ALUMNO | Detalle de un proyecto |
 | `POST` | `/projects/:id/apply` | ALUMNO | Postularse a un proyecto |
-| `DELETE` | `/projects/:id/apply` | ALUMNO | Retirar postulación (opcional) |
+| `DELETE` | `/projects/:id/apply` | ALUMNO | Retirar postulación (solo `PENDIENTE`, borrado físico) |
 | `GET` | `/applications/my` | ALUMNO | Historial de postulaciones |
+| `GET` | `/applications/:id` | ALUMNO | Detalle de una postulación propia |
 
 ## Estructura de código sugerida
 
@@ -97,11 +110,13 @@ pages/
     ├── dashboard-page.tsx          # /alumno/dashboard — exploración y recomendaciones
     ├── project-detail-page.tsx     # /alumno/proyecto/:id — detalle + botón postularse
     ├── postulaciones-page.tsx      # /alumno/postulaciones — historial del alumno
+    ├── postulacion-detail-page.tsx # /alumno/postulaciones/:id — detalle y seguimiento
     ├── labs-page.tsx               # /alumno/laboratorios — listado de laboratorios
     └── lab-detail-page.tsx         # /alumno/laboratorios/:id — detalle de un lab
 
 services/
-└── projects.ts                     # findAll, findById, getMyApplications, applyToProject
+└── projects.ts                     # findAll, findById, getMyApplications,
+                                    # getMyApplicationById, applyToProject, withdrawApplication
 ```
 
 ## Consideraciones
