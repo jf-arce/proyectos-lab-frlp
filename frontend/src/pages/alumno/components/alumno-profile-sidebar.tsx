@@ -11,6 +11,7 @@ interface AlumnoProfileSidebarProps {
   email?: string;
   anioEnCurso?: number;
   bio?: string | null;
+  postulacionesActivas: number;
 }
 
 export function AlumnoProfileSidebar({
@@ -19,6 +20,7 @@ export function AlumnoProfileSidebar({
   email,
   anioEnCurso,
   bio,
+  postulacionesActivas,
 }: AlumnoProfileSidebarProps) {
   return (
     <aside className="lg:sticky top-20.25 self-start mb-0">
@@ -73,7 +75,9 @@ export function AlumnoProfileSidebar({
               <p className="text-foreground text-sm leading-tight">
                 Postulaciones activas:
               </p>
-              <p className="text-primary font-bold text-sm leading-none">0</p>
+              <p className="text-primary font-bold text-sm leading-none">
+                {postulacionesActivas}
+              </p>
             </div>
           </nav>
         </CardContent>

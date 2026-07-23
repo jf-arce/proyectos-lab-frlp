@@ -1,9 +1,16 @@
 import { cn } from '@/lib/utils';
 
-export type Status = 'pending' | 'accepted' | 'rejected' | 'active' | 'closed';
+export type Status =
+  | 'pending'
+  | 'reviewing'
+  | 'accepted'
+  | 'rejected'
+  | 'active'
+  | 'closed';
 
 const statusConfig: Record<Status, { label: string; className: string }> = {
   pending: { label: 'Pendiente', className: 'status-pending' },
+  reviewing: { label: 'En revisión', className: 'status-reviewing' },
   accepted: { label: 'Aceptada', className: 'status-accepted' },
   rejected: { label: 'Rechazada', className: 'status-rejected' },
   active: { label: 'Activo', className: 'status-accepted' },
@@ -13,6 +20,7 @@ const statusConfig: Record<Status, { label: string; className: string }> = {
 // Mapea los estados que devuelve el backend al prop `status`
 export const ESTADO_TO_STATUS = {
   PENDIENTE: 'pending',
+  EN_REVISION: 'reviewing',
   ACEPTADA: 'accepted',
   RECHAZADA: 'rejected',
   ACTIVO: 'active',

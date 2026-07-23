@@ -4,6 +4,7 @@ import { StudentLayout } from '@/layouts/student-layout';
 import { AlumnoDashboardPage } from '@/pages/alumno/dashboard-page';
 import { LaboratoriosPage } from '@/pages/alumno/labs-page';
 import { LaboratorioDetailPage } from '@/pages/alumno/lab-detail-page';
+import { LabProyectosPage } from '@/pages/alumno/lab-projects-page';
 import { ProjectDetailPage } from '@/pages/alumno/project-detail-page';
 import { PostulacionesPage } from '@/pages/alumno/postulaciones-page';
 import { PostulacionDetailPage } from '@/pages/alumno/postulacion-detail-page';
@@ -21,6 +22,10 @@ export const alumnoRoutes = [
           {
             path: '/alumno/laboratorios/:id',
             element: <LaboratorioDetailPage />,
+          },
+          {
+            path: '/alumno/laboratorios/:id/proyectos',
+            element: <LabProyectosPage />,
           },
           { path: '/alumno/proyecto/:id', element: <ProjectDetailPage /> },
           { path: '/alumno/postulaciones', element: <PostulacionesPage /> },

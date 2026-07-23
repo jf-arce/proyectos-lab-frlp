@@ -161,7 +161,7 @@ Registra la postulación de un alumno a un proyecto.
 | `id`          | uuid      | Clave primaria                                |
 | `alumno_id`   | uuid FK   | Alumno que se postula                         |
 | `proyecto_id` | uuid FK   | Proyecto al que se postula                    |
-| `estado`      | string    | Valores: `PENDIENTE`, `ACEPTADA`, `RECHAZADA` |
+| `estado`      | string    | Valores: `PENDIENTE`, `EN_REVISION`, `ACEPTADA`, `RECHAZADA` |
 | `created_at`  | timestamp | Fecha de postulación                          |
 | `updated_at`  | timestamp | Última actualización de estado                |
 

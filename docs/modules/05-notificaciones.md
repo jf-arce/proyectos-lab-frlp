@@ -35,7 +35,7 @@ Las notificaciones se crean como efecto secundario de acciones en otros módulos
 
 | Evento | Módulo origen | Notificación generada |
 |--------|---------------|-----------------------|
-| Responsable cambia estado de postulación a ACCEPTED/REJECTED | Módulo 3 | Notificación al alumno |
+| Responsable cambia estado de postulación a `EN_REVISION` / `ACEPTADA` / `RECHAZADA` | Módulo 3 | Notificación al alumno (in-app + email), con mensaje propio por estado |
 | Alumno se postula a un proyecto | Módulo 4 | Notificación al responsable |
 
 El desacoplamiento se logra con el sistema de eventos de NestJS (`EventEmitter2`). El módulo de notificaciones escucha los eventos y actúa:

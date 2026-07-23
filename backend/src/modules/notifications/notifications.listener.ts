@@ -85,7 +85,8 @@ export class NotificationsListener {
   async handleEstadoActualizado(
     payload: PostulacionEstadoActualizadoEvent,
   ): Promise<void> {
-    if (payload.nuevoEstado === PostulacionEstado.PENDIENTE) return;
+    const { nuevoEstado } = payload;
+    if (nuevoEstado === PostulacionEstado.PENDIENTE) return;
 
     try {
       const postulacion = await this.postulacionRepository.findOne({
@@ -96,12 +97,17 @@ export class NotificationsListener {
       if (!postulacion) return;
 
       const { alumno, proyecto } = postulacion;
-      const estadoTexto =
-        payload.nuevoEstado === PostulacionEstado.ACEPTADA
-          ? 'aceptada'
-          : 'rechazada';
 
-      const mensaje = `Tu postulación al proyecto "${proyecto.titulo}" fue ${estadoTexto}.`;
+      const mensajesPorEstado: Record<
+        Exclude<PostulacionEstado, PostulacionEstado.PENDIENTE>,
+        string
+      > = {
+        [PostulacionEstado.EN_REVISION]: `Tu postulación al proyecto "${proyecto.titulo}" está siendo revisada por el laboratorio.`,
+        [PostulacionEstado.ACEPTADA]: `Tu postulación al proyecto "${proyecto.titulo}" fue aceptada.`,
+        [PostulacionEstado.RECHAZADA]: `Tu postulación al proyecto "${proyecto.titulo}" fue rechazada.`,
+      };
+
+      const mensaje = mensajesPorEstado[nuevoEstado];
 
       // Notificación in-app
       await this.notificationsService.create({
@@ -118,7 +124,7 @@ export class NotificationsListener {
           alumnoEmail: alumno.usuario.email,
           alumnoNombre: alumno.nombre,
           proyectoTitulo: proyecto.titulo,
-          nuevoEstado: payload.nuevoEstado,
+          nuevoEstado,
         })
         .then(async () => {
           // Marcar email como enviado

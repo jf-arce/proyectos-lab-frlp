@@ -35,11 +35,17 @@ export class EmailService {
     params: SendEstadoActualizadoParams,
   ): Promise<void> {
     if (!this.resend) return;
+    if (params.nuevoEstado === PostulacionEstado.PENDIENTE) return;
 
-    const estadoTexto =
-      params.nuevoEstado === PostulacionEstado.ACEPTADA
-        ? 'aceptada ✅'
-        : 'rechazada ❌';
+    const estadoTextoPorEstado: Record<
+      Exclude<PostulacionEstado, PostulacionEstado.PENDIENTE>,
+      string
+    > = {
+      [PostulacionEstado.EN_REVISION]: 'en revisión 🔎',
+      [PostulacionEstado.ACEPTADA]: 'aceptada ✅',
+      [PostulacionEstado.RECHAZADA]: 'rechazada ❌',
+    };
+    const estadoTexto = estadoTextoPorEstado[params.nuevoEstado];
 
     const subject = `Tu postulación al proyecto "${params.proyectoTitulo}" fue ${estadoTexto}`;
 

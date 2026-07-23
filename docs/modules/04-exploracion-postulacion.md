@@ -34,7 +34,7 @@ Es la cara pública de la plataforma para los alumnos. Permite descubrir todos l
 ### Historial de postulaciones del alumno ✅ (implementado)
 
 - Endpoint `GET /applications/my` que lista todas las postulaciones del alumno autenticado.
-- Incluye datos del proyecto (título, laboratorio con `emailContacto`, skills) y el estado actual (`PENDIENTE`, `ACEPTADA`, `RECHAZADA`).
+- Incluye datos del proyecto (título, laboratorio con `emailContacto`, skills) y el estado actual (`PENDIENTE`, `EN_REVISION`, `ACEPTADA`, `RECHAZADA`).
 - Ordenado por fecha de postulación descendente. Sin paginación ni filtros de backend: el frontend filtra client-side (por estado y por texto en título de proyecto / nombre de laboratorio).
 - Frontend: `/alumno/postulaciones` (listado en cards) y `/alumno/postulaciones/:id` (detalle con seguimiento del estado, datos del proyecto, contacto del laboratorio y acción de retirar).
 
@@ -46,8 +46,21 @@ Es la cara pública de la plataforma para los alumnos. Permite descubrir todos l
 ### Retirar postulación ✅ (implementado)
 
 - Endpoint `DELETE /projects/:id/apply` (rol `ALUMNO`), donde `:id` es el id del **proyecto**.
-- Solo se permite mientras la postulación está `PENDIENTE`; en otro estado responde `400`.
+- Se permite mientras la postulación está `PENDIENTE` o `EN_REVISION`; una vez resuelta (`ACEPTADA` / `RECHAZADA`) responde `400`.
 - Es un borrado físico: el alumno puede volver a postularse al mismo proyecto después de retirarse.
+
+### Estados de la postulación (máquina de estados)
+
+```
+PENDIENTE ─┬─▶ EN_REVISION ─▶ ACEPTADA / RECHAZADA
+           └────────────────▶ ACEPTADA / RECHAZADA   (el paso EN_REVISION es opcional)
+```
+
+- `EN_REVISION` lo marca **manualmente** el responsable desde su panel (botón "Marcar en revisión") cuando empieza a evaluar la postulación. Es opcional: puede aceptar/rechazar directo desde `PENDIENTE`.
+- `ACEPTADA` y `RECHAZADA` son **terminales**: no se pueden modificar (responde `400`). Tampoco se puede volver a `PENDIENTE`.
+- Cada transición dispara notificación al alumno (Módulo 5), incluida la de entrada a `EN_REVISION`.
+- Cupos: solo las postulaciones `ACEPTADA` consumen cupo; `EN_REVISION` no reserva cupo.
+- En el detalle del alumno (`/alumno/postulaciones/:id`), el timeline refleja estos estados: "Enviada" (siempre), "Revisión del laboratorio" (activa en `EN_REVISION`, completa al resolverse) y "Resultado".
 
 ### Endpoints
 
@@ -56,7 +69,7 @@ Es la cara pública de la plataforma para los alumnos. Permite descubrir todos l
 | `GET` | `/projects` | ALUMNO | Listar proyectos activos con filtros |
 | `GET` | `/projects/:id` | ALUMNO | Detalle de un proyecto |
 | `POST` | `/projects/:id/apply` | ALUMNO | Postularse a un proyecto |
-| `DELETE` | `/projects/:id/apply` | ALUMNO | Retirar postulación (solo `PENDIENTE`, borrado físico) |
+| `DELETE` | `/projects/:id/apply` | ALUMNO | Retirar postulación (`PENDIENTE` o `EN_REVISION`, borrado físico) |
 | `GET` | `/applications/my` | ALUMNO | Historial de postulaciones |
 | `GET` | `/applications/:id` | ALUMNO | Detalle de una postulación propia |
 

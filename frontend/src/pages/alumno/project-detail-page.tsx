@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 import { ArrowLeft, Clock, FlaskConical, Mail } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
@@ -15,6 +15,7 @@ import { ProjectActionCard } from './components/project-action-card';
 export function ProjectDetailPage() {
   const { token } = useAuth();
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [hasApplied, setHasApplied] = useState(false);
@@ -75,11 +76,9 @@ export function ProjectDetailPage() {
         <p className="text-destructive text-lg font-medium">
           {error ?? 'Proyecto no encontrado'}
         </p>
-        <Button variant="outline" asChild>
-          <Link to="/alumno/dashboard">
-            <ArrowLeft className="size-4 mr-2" />
-            Volver al inicio
-          </Link>
+        <Button variant="outline" onClick={() => navigate(-1)}>
+          <ArrowLeft className="size-4 mr-2" />
+          Volver
         </Button>
       </div>
     );
@@ -89,13 +88,14 @@ export function ProjectDetailPage() {
 
   return (
     <div className="space-y-6">
-      <Link
-        to="/alumno/dashboard"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
       >
         <ArrowLeft className="size-4" />
-        Volver a proyectos
-      </Link>
+        Volver
+      </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* ── Left column ── */}

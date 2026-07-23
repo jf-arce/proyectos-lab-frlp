@@ -47,7 +47,11 @@ export interface ProjectDetail {
   skills: ProjectSkill[];
 }
 
-export type PostulacionEstado = 'PENDIENTE' | 'ACEPTADA' | 'RECHAZADA';
+export type PostulacionEstado =
+  | 'PENDIENTE'
+  | 'EN_REVISION'
+  | 'ACEPTADA'
+  | 'RECHAZADA';
 
 export interface MyApplicationProject {
   id: string;

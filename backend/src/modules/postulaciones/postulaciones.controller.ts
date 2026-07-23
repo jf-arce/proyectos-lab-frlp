@@ -61,7 +61,9 @@ export class PostulacionesController {
 
   @Patch('applications/:id/status')
   @Roles(UserRole.RESPONSABLE_LABORATORIO)
-  @ApiOperation({ summary: 'Aceptar o rechazar una postulación' })
+  @ApiOperation({
+    summary: 'Marcar en revisión, aceptar o rechazar una postulación',
+  })
   @ApiResponse({
     status: 200,
     description: 'Estado actualizado.',
@@ -69,7 +71,8 @@ export class PostulacionesController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Estado inválido (no se puede volver a PENDIENTE).',
+    description:
+      'Estado inválido (no se puede volver a PENDIENTE ni modificar una postulación ya resuelta).',
   })
   updateApplicationStatus(
     @Req() req: AuthenticatedRequest,

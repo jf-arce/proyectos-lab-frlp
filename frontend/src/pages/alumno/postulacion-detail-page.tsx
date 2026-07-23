@@ -4,10 +4,12 @@ import { toast } from 'sonner';
 import {
   ArrowLeft,
   CalendarDays,
+  Check,
   Clock,
   FlaskConical,
   Mail,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { projectsService } from '@/services/projects';
 import type { MyApplication } from '@/types/projects';
@@ -29,11 +31,28 @@ import { ProjectDetailSkeleton } from './components/project-detail-skeleton';
 
 const estadoMensajes = {
   PENDIENTE:
-    'El laboratorio todavía no revisó tu postulación. Te vamos a avisar cuando haya novedades.',
+    'Tu postulación fue enviada y aún no fue tomada para revisión. Te vamos a avisar cuando haya novedades.',
+  EN_REVISION:
+    'El laboratorio está revisando tu postulación. Te vamos a avisar cuando haya una decisión.',
   ACEPTADA:
     '¡Felicitaciones! Tu postulación fue aceptada. Contactá al laboratorio para coordinar los próximos pasos.',
   RECHAZADA:
     'Tu postulación no fue seleccionada esta vez. Podés seguir explorando otros proyectos.',
+} as const;
+
+const estadoTitulos = {
+  PENDIENTE: 'Tu postulación fue enviada',
+  EN_REVISION: 'Tu postulación está en revisión',
+  ACEPTADA: 'Tu postulación fue aceptada',
+  RECHAZADA: 'Tu postulación no fue seleccionada',
+} as const;
+
+// Clase de acento (token de estado) para el dot del hero
+const estadoAccentClass = {
+  PENDIENTE: 'status-pending',
+  EN_REVISION: 'status-reviewing',
+  ACEPTADA: 'status-accepted',
+  RECHAZADA: 'status-rejected',
 } as const;
 
 function formatDate(iso: string): string {
@@ -115,6 +134,10 @@ export function PostulacionDetailPage() {
 
   const { proyecto } = application;
   const isPendiente = application.estado === 'PENDIENTE';
+  const enRevision = application.estado === 'EN_REVISION';
+  const isResuelta =
+    application.estado === 'ACEPTADA' || application.estado === 'RECHAZADA';
+  const canWithdraw = isPendiente || enRevision;
   const wasUpdated = application.updatedAt !== application.createdAt;
 
   return (
@@ -128,11 +151,171 @@ export function PostulacionDetailPage() {
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* ── Left column: datos del proyecto y laboratorio ── */}
-        <div className="lg:col-span-8 space-y-6">
+        {/* ── Izquierda: estado de la postulación ── */}
+        <div className="lg:col-span-7 space-y-6">
+          <Card className="py-0">
+            <CardContent className="rounded-md p-6 space-y-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <span
+                  className={cn(
+                    'inline-flex size-2.5 shrink-0 rounded-full',
+                    estadoAccentClass[application.estado],
+                  )}
+                  aria-hidden
+                />
+                <StatusBadge status={ESTADO_TO_STATUS[application.estado]} />
+              </div>
+
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground leading-tight tracking-tight">
+                {estadoTitulos[application.estado]}
+              </h1>
+
+              <p className="text-muted-foreground leading-relaxed">
+                {estadoMensajes[application.estado]}
+              </p>
+
+              {canWithdraw && (
+                <div className="flex justify-end pt-1">
+                  <Button
+                    variant="outline"
+                    className="text-destructive hover:text-destructive"
+                    onClick={() => setIsWithdrawDialogOpen(true)}
+                  >
+                    Retirar postulación
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* ── Timeline: recorrido de la postulación ── */}
           <Card>
-            <CardContent className="pt-6 space-y-5">
-              <div className="flex flex-wrap gap-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <CalendarDays className="size-4 text-primary" />
+                Recorrido de tu postulación
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ol className="space-y-0">
+                {/* Nodo 1 — Enviada (siempre completa) */}
+                <li className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground ring-2 ring-primary/30">
+                      <Check className="size-4" />
+                    </span>
+                    <span
+                      className={cn(
+                        'w-px flex-1',
+                        enRevision || isResuelta ? 'bg-primary' : 'bg-border',
+                      )}
+                    />
+                  </div>
+                  <div className="pb-6">
+                    <p className="font-medium text-foreground">
+                      Postulación enviada
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatDate(application.createdAt)}
+                    </p>
+                  </div>
+                </li>
+
+                {/* Nodo 2 — En revisión */}
+                <li className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <span
+                      className={cn(
+                        'flex size-7 shrink-0 items-center justify-center rounded-full ring-2',
+                        enRevision || isResuelta
+                          ? 'bg-primary text-primary-foreground ring-primary/30'
+                          : 'bg-muted text-muted-foreground ring-border',
+                      )}
+                    >
+                      {isResuelta ? (
+                        <Check className="size-4" />
+                      ) : (
+                        <Clock className="size-3.5" />
+                      )}
+                    </span>
+                    <span
+                      className={cn(
+                        'w-px flex-1',
+                        isResuelta ? 'bg-primary' : 'bg-border',
+                      )}
+                    />
+                  </div>
+                  <div className="pb-6">
+                    <p
+                      className={cn(
+                        'font-medium',
+                        isPendiente
+                          ? 'text-muted-foreground'
+                          : 'text-foreground',
+                      )}
+                    >
+                      Revisión del laboratorio
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {isPendiente
+                        ? 'Pendiente de revisión'
+                        : enRevision
+                          ? 'En curso'
+                          : 'Revisión completada'}
+                    </p>
+                  </div>
+                </li>
+
+                {/* Nodo 3 — Resultado */}
+                <li className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <span
+                      className={cn(
+                        'flex size-7 shrink-0 items-center justify-center rounded-full ring-2 ring-border',
+                        isResuelta
+                          ? estadoAccentClass[application.estado]
+                          : 'bg-muted text-muted-foreground',
+                      )}
+                    >
+                      {application.estado === 'ACEPTADA' ? (
+                        <Check className="size-4" />
+                      ) : (
+                        <span className="size-1.5 rounded-full bg-current" />
+                      )}
+                    </span>
+                  </div>
+                  <div>
+                    <p
+                      className={cn(
+                        'font-medium',
+                        isResuelta
+                          ? 'text-foreground'
+                          : 'text-muted-foreground',
+                      )}
+                    >
+                      {application.estado === 'ACEPTADA'
+                        ? 'Aceptada'
+                        : application.estado === 'RECHAZADA'
+                          ? 'No seleccionada'
+                          : 'Resultado'}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {isResuelta && wasUpdated
+                        ? formatDate(application.updatedAt)
+                        : 'Pendiente de resolución'}
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
+          {/* Proyecto */}
+          <Card>
+            <CardContent className="space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
                 <StatusBadge status={ESTADO_TO_STATUS[proyecto.estado]} />
                 {proyecto.duracion && (
                   <Badge variant="secondary" className="gap-1">
@@ -142,28 +325,23 @@ export function PostulacionDetailPage() {
                 )}
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-extrabold text-foreground leading-tight tracking-tight">
+              <h2 className="text-lg md:text-xl font-bold text-foreground leading-snug tracking-tight">
                 {proyecto.titulo}
-              </h1>
+              </h2>
 
-              <p className="text-muted-foreground leading-relaxed text-base">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 {proyecto.descripcion}
               </p>
 
               {proyecto.skills.length > 0 && (
-                <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">
-                    Habilidades requeridas
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {proyecto.skills.map((skill) => (
-                      <SkillTag key={skill.id}>{skill.nombre}</SkillTag>
-                    ))}
-                  </div>
+                <div className="flex flex-wrap gap-2">
+                  {proyecto.skills.map((skill) => (
+                    <SkillTag key={skill.id}>{skill.nombre}</SkillTag>
+                  ))}
                 </div>
               )}
 
-              <Button variant="outline" asChild>
+              <Button variant="outline" size="sm" asChild>
                 <Link to={`/alumno/proyecto/${proyecto.id}`}>
                   Ver proyecto completo
                 </Link>
@@ -171,6 +349,7 @@ export function PostulacionDetailPage() {
             </CardContent>
           </Card>
 
+          {/* Laboratorio */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
@@ -190,7 +369,7 @@ export function PostulacionDetailPage() {
               {proyecto.laboratorio.emailContacto && (
                 <a
                   href={`mailto:${proyecto.laboratorio.emailContacto}`}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline pt-1"
                 >
                   <Mail className="size-3.5" />
                   {proyecto.laboratorio.emailContacto}
@@ -198,81 +377,6 @@ export function PostulacionDetailPage() {
               )}
             </CardContent>
           </Card>
-        </div>
-
-        {/* ── Right sidebar: seguimiento y acciones ── */}
-        <div className="lg:col-span-4 lg:sticky top-24 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">
-                Seguimiento de tu postulación
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  Estado actual
-                </span>
-                <StatusBadge status={ESTADO_TO_STATUS[application.estado]} />
-              </div>
-
-              <p className="text-sm text-muted-foreground leading-relaxed bg-muted rounded-md p-3">
-                {estadoMensajes[application.estado]}
-              </p>
-
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <CalendarDays className="size-3.5 shrink-0" />
-                  <span>
-                    Postulado el{' '}
-                    <span className="font-medium text-foreground">
-                      {formatDate(application.createdAt)}
-                    </span>
-                  </span>
-                </div>
-                {wasUpdated && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Clock className="size-3.5 shrink-0" />
-                    <span>
-                      Última actualización el{' '}
-                      <span className="font-medium text-foreground">
-                        {formatDate(application.updatedAt)}
-                      </span>
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {isPendiente && (
-                <Button
-                  variant="outline"
-                  className="w-full text-destructive hover:text-destructive"
-                  onClick={() => setIsWithdrawDialogOpen(true)}
-                >
-                  Retirar postulación
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-
-          {proyecto.laboratorio.emailContacto && (
-            <Card className="bg-primary text-primary-foreground">
-              <CardContent className="space-y-2">
-                <p className="font-semibold text-sm">¿Consultas?</p>
-                <p className="text-xs opacity-80">
-                  Contactá al equipo del laboratorio para resolver dudas sobre
-                  tu postulación.
-                </p>
-                <a
-                  href={`mailto:${proyecto.laboratorio.emailContacto}`}
-                  className="inline-flex items-center gap-1.5 text-sm font-bold hover:underline mt-1"
-                >
-                  <Mail className="size-3.5" />
-                  {proyecto.laboratorio.emailContacto}
-                </a>
-              </CardContent>
-            </Card>
-          )}
         </div>
       </div>
 
