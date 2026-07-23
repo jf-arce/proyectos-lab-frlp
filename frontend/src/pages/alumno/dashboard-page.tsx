@@ -25,7 +25,9 @@ export function AlumnoDashboardPage() {
       .getMyApplications(token)
       .then((apps) => {
         setPostulacionesActivas(
-          apps.filter((app) => app.estado === 'PENDIENTE').length,
+          apps.filter((app) =>
+            ['PENDIENTE', 'EN_REVISION'].includes(app.estado),
+          ).length,
         );
       })
       .catch(() => {

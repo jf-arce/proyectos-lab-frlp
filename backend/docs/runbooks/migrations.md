@@ -81,3 +81,13 @@ Verificar que el build esté actualizado (`npm run build`) antes del deploy. Las
 ### Se quiere ignorar una migración generada
 
 Eliminar el archivo. No hacer `migration:run` de una migración que no se quiere aplicar.
+
+### Agregar un valor a un enum nativo de Postgres
+
+Campos como `postulacion.estado` usan `type: 'enum'`, que en Postgres crea un tipo enum nativo (`postulacion_estado_enum`). En **desarrollo** `synchronize` aplica el cambio al reiniciar. En **producción**, sumar un valor requiere una migración con:
+
+```sql
+ALTER TYPE "postulacion_estado_enum" ADD VALUE 'EN_REVISION';
+```
+
+> `ADD VALUE` no se puede ejecutar dentro de un bloque transaccional en versiones viejas de Postgres, y no es reversible con un simple `down`. Al generar la migración inicial (`InitialSchema`) el enum ya incluye todos los valores actuales (`PENDIENTE`, `EN_REVISION`, `ACEPTADA`, `RECHAZADA`); esta nota aplica solo si se agrega un valor **después** de que el enum ya exista en una DB de producción.

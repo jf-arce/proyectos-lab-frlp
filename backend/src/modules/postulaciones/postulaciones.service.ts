@@ -71,6 +71,13 @@ export class PostulacionesService {
       throw new BadRequestException('No se puede volver al estado PENDIENTE');
     }
 
+    const esTerminal =
+      postulacion.estado === PostulacionEstado.ACEPTADA ||
+      postulacion.estado === PostulacionEstado.RECHAZADA;
+    if (esTerminal) {
+      throw new BadRequestException('La postulación ya fue resuelta');
+    }
+
     postulacion.estado = dto.estado;
     const updated = await this.postulacionRepository.save(postulacion);
 
@@ -118,9 +125,12 @@ export class PostulacionesService {
       throw new NotFoundException('No estás postulado a este proyecto');
     }
 
-    if (postulacion.estado !== PostulacionEstado.PENDIENTE) {
+    const yaResuelta =
+      postulacion.estado === PostulacionEstado.ACEPTADA ||
+      postulacion.estado === PostulacionEstado.RECHAZADA;
+    if (yaResuelta) {
       throw new BadRequestException(
-        'Solo se puede retirar una postulación pendiente',
+        'No se puede retirar una postulación que ya fue resuelta',
       );
     }
 

@@ -40,13 +40,15 @@ Desde el panel del responsable, puede ver las postulaciones a cada proyecto y ca
 | Método | Ruta | Descripción |
 |--------|------|-------------|
 | `GET` | `/projects/:id/applications` | Ver postulaciones de un proyecto |
-| `PATCH` | `/applications/:id/status` | Cambiar estado: `PENDIENTE` → `ACEPTADA` \| `RECHAZADA` |
+| `PATCH` | `/applications/:id/status` | Cambiar estado: `PENDIENTE`/`EN_REVISION` → `EN_REVISION` \| `ACEPTADA` \| `RECHAZADA` |
+
+Transiciones válidas (ver máquina de estados completa en el Módulo 4): el paso `EN_REVISION` es **opcional** (el responsable puede aceptar/rechazar directo desde `PENDIENTE`, o marcar "En revisión" primero). Una postulación ya resuelta (`ACEPTADA`/`RECHAZADA`) no se puede modificar y no se puede volver a `PENDIENTE` — ambos casos responden `400`.
 
 Además de la gestión de estados, el responsable puede acceder a la vista de perfil de cada alumno postulante mediante el enlace **"Ver perfil"**, que abre una vista detallada pero de solo lectura del candidato.
 
 > Estos endpoints están implementados en `PostulacionesController` (`src/modules/postulaciones/`), no en `ProyectosController`. Ver estructura en el Módulo 4.
 
-Al cambiar el estado de una postulación, se dispara una notificación al alumno (Módulo 5).
+Al cambiar el estado de una postulación (incluida la entrada a `EN_REVISION`), se dispara una notificación al alumno (Módulo 5).
 
 ### Control de acceso
 
@@ -82,7 +84,7 @@ postulaciones/
 ├── entities/
 │   └── postulacion.entity.ts
 ├── enums/
-│   └── postulacion-estado.enum.ts  # PostulacionEstado (PENDIENTE | ACEPTADA | RECHAZADA)
+│   └── postulacion-estado.enum.ts  # PostulacionEstado (PENDIENTE | EN_REVISION | ACEPTADA | RECHAZADA)
 └── dto/
     └── update-postulacion-estado.dto.ts
 ```
@@ -148,7 +150,7 @@ export class Postulacion {
   proyecto: Proyecto;
 
   @Column({ type: 'enum', enum: PostulacionEstado, default: PostulacionEstado.PENDIENTE })
-  estado: PostulacionEstado;    // PENDIENTE | ACEPTADA | RECHAZADA
+  estado: PostulacionEstado;    // PENDIENTE | EN_REVISION | ACEPTADA | RECHAZADA
 
   @CreateDateColumn()
   createdAt: Date;

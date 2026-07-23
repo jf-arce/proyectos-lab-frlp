@@ -16,6 +16,7 @@ import {
 const estadoOptions = [
   { value: 'all', label: 'Todas' },
   { value: 'PENDIENTE', label: 'Pendiente' },
+  { value: 'EN_REVISION', label: 'En revisión' },
   { value: 'ACEPTADA', label: 'Aceptada' },
   { value: 'RECHAZADA', label: 'Rechazada' },
 ];

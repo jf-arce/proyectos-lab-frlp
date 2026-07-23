@@ -138,10 +138,13 @@ Muestra el estado de una postulación o proyecto como una etiqueta pill. Es un c
 
 | Prop | Tipo | Descripción |
 |---|---|---|
-| `status` | `"pending" \| "accepted" \| "rejected" \| "active" \| "closed"` | Estado a mostrar |
+| `status` | `"pending" \| "reviewing" \| "accepted" \| "rejected" \| "active" \| "closed"` | Estado a mostrar |
+
+El estado `reviewing` (azul institucional, token `--status-reviewing-*`) corresponde a la postulación `EN_REVISION`. El mapa `ESTADO_TO_STATUS` traduce los estados del backend (`PENDIENTE`, `EN_REVISION`, `ACEPTADA`, `RECHAZADA`, `ACTIVO`, `CERRADO`) al prop `status`.
 
 ```tsx
 <StatusBadge status="pending" />
+<StatusBadge status="reviewing" />
 <StatusBadge status="accepted" />
 ```
 

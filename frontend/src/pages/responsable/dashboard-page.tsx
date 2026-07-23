@@ -36,6 +36,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { StatusBadge, ESTADO_TO_STATUS } from '@/components/ui/status-badge';
 import { cn } from '@/lib/utils';
 
 export function ResponsableDashboardPage() {
@@ -127,16 +128,21 @@ export function ResponsableDashboardPage() {
 
   const handleUpdateApplication = async (
     applicationId: string,
-    status: 'ACEPTADO' | 'RECHAZADO',
+    status: 'EN_REVISION' | 'ACEPTADA' | 'RECHAZADA',
   ) => {
     if (!token || !selectedProject) return;
+    const toastText: Record<typeof status, string> = {
+      EN_REVISION: 'Postulación marcada en revisión',
+      ACEPTADA: 'Postulación aceptada',
+      RECHAZADA: 'Postulación rechazada',
+    };
     try {
       await proyectosService.updateApplicationStatus(
         applicationId,
         status,
         token,
       );
-      toast.success(`Postulación ${status.toLowerCase()}`);
+      toast.success(toastText[status]);
       // Refresh applicants
       const data = await proyectosService.getProjectApplications(
         selectedProject.id,
@@ -542,33 +548,40 @@ export function ResponsableDashboardPage() {
                           </Link>
                         </div>
                         <div className="flex items-center gap-2 mt-1">
-                          <Badge
-                            variant="outline"
-                            className={cn(
-                              'text-[10px] uppercase font-black px-1.5 h-4 tracking-tighter',
-                              post.estado === 'ACEPTADO'
-                                ? 'text-green-600 border-green-200 bg-green-50'
-                                : post.estado === 'RECHAZADO'
-                                  ? 'text-red-600 border-red-200 bg-red-50'
-                                  : 'text-amber-600 border-amber-200 bg-amber-50',
-                            )}
-                          >
-                            {post.estado}
-                          </Badge>
+                          <StatusBadge
+                            status={
+                              ESTADO_TO_STATUS[
+                                post.estado as keyof typeof ESTADO_TO_STATUS
+                              ]
+                            }
+                          />
                           <span className="text-[10px] text-muted-foreground font-medium">
                             Postulado hace poco
                           </span>
                         </div>
                       </div>
                     </div>
-                    {post.estado === 'PENDIENTE' && (
+                    {(post.estado === 'PENDIENTE' ||
+                      post.estado === 'EN_REVISION') && (
                       <div className="flex gap-2 w-full sm:w-auto justify-end">
+                        {post.estado === 'PENDIENTE' && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-9 px-4 text-xs font-bold text-primary hover:bg-primary/10 rounded-lg transition-all"
+                            onClick={() =>
+                              handleUpdateApplication(post.id, 'EN_REVISION')
+                            }
+                          >
+                            Marcar en revisión
+                          </Button>
+                        )}
                         <Button
                           size="sm"
                           variant="ghost"
                           className="h-9 px-4 text-xs font-bold text-destructive hover:bg-destructive/10 rounded-lg transition-all"
                           onClick={() =>
-                            handleUpdateApplication(post.id, 'RECHAZADO')
+                            handleUpdateApplication(post.id, 'RECHAZADA')
                           }
                         >
                           Rechazar
@@ -577,7 +590,7 @@ export function ResponsableDashboardPage() {
                           size="sm"
                           className="h-9 px-5 text-xs font-bold rounded-lg shadow-md hover:scale-105 active:scale-95 transition-all"
                           onClick={() =>
-                            handleUpdateApplication(post.id, 'ACEPTADO')
+                            handleUpdateApplication(post.id, 'ACEPTADA')
                           }
                         >
                           Aceptar
