@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -90,6 +91,41 @@ export class PostulacionesController {
     return this.postulacionesService.getMyApplications(req.user.userId);
   }
 
+  // Debe declararse después de 'applications/my' para que 'my' no matchee como :id
+  @Get('applications/:id')
+  @Roles(UserRole.ALUMNO)
+  @ApiOperation({ summary: 'Ver el detalle de una postulación propia' })
+  @ApiResponse({ status: 200, type: Postulacion })
+  @ApiResponse({
+    status: 404,
+    description: 'Postulación no encontrada o no pertenece al alumno.',
+  })
+  getMyApplicationById(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<Postulacion> {
+    return this.postulacionesService.getMyApplicationById(req.user.userId, id);
+  }
+
+  @Delete('projects/:id/apply')
+  @Roles(UserRole.ALUMNO)
+  @ApiOperation({ summary: 'Retirar mi postulación a un proyecto' })
+  @ApiResponse({ status: 200, description: 'Postulación retirada.' })
+  @ApiResponse({
+    status: 400,
+    description: 'Solo se puede retirar una postulación pendiente.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'El alumno no está postulado a este proyecto.',
+  })
+  withdraw(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
+    return this.postulacionesService.withdraw(id, req.user.userId);
+  }
+
   @Post('projects/:id/apply')
   @Roles(UserRole.ALUMNO)
   @ApiOperation({ summary: 'Postularse a un proyecto' })
@@ -100,6 +136,10 @@ export class PostulacionesController {
   })
   @ApiResponse({
     status: 400,
+    description: 'El proyecto no está activo o no tiene cupos disponibles.',
+  })
+  @ApiResponse({
+    status: 409,
     description: 'Ya te postulaste a este proyecto.',
   })
   apply(

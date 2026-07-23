@@ -46,7 +46,8 @@ src/
 │   │   ├── labs-page.tsx            # /alumno/laboratorios
 │   │   ├── lab-detail-page.tsx      # /alumno/laboratorios/:id
 │   │   ├── project-detail-page.tsx  # /alumno/proyecto/:id
-│   │   └── postulaciones-page.tsx   # /alumno/postulaciones
+│   │   ├── postulaciones-page.tsx   # /alumno/postulaciones
+│   │   └── postulacion-detail-page.tsx  # /alumno/postulaciones/:id
 │   │
 │   └── responsable/
 │       ├── components/                      # Componentes exclusivos de páginas de responsable
@@ -56,7 +57,8 @@ src/
 │
 ├── services/                    # Llamadas a la API REST, una por dominio
 │   ├── auth.ts                  # login, register, refresh, logout
-│   ├── projects.ts              # findAll, findById, applyToProject, getMyApplications
+│   ├── projects.ts              # findAll, findById, applyToProject, getMyApplications,
+│   │                            #   getMyApplicationById, withdrawApplication
 │   ├── proyectos.ts             # operaciones del responsable (create, update, status)
 │   ├── skills.ts
 │   ├── profile.ts               # (pendiente)
@@ -106,6 +108,7 @@ export const alumnoRoutes = [
       { path: '/alumno/laboratorios/:id', element: <LaboratorioDetailPage /> },
       { path: '/alumno/proyecto/:id', element: <ProjectDetailPage /> },
       { path: '/alumno/postulaciones', element: <PostulacionesPage /> },
+      { path: '/alumno/postulaciones/:id', element: <PostulacionDetailPage /> },
     ],
   },
 ];

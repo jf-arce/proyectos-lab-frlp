@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -8,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Proyecto } from '@/modules/proyectos/entities/proyecto.entity';
+import { ProyectoEstado } from '@/modules/proyectos/enums/proyectos-estados.enum';
 import { AlumnoService } from '@/modules/alumno/alumno.service';
 import {
   POSTULACION_CREADA,
@@ -89,8 +91,51 @@ export class PostulacionesService {
     });
   }
 
+  async getMyApplicationById(
+    userId: string,
+    appId: string,
+  ): Promise<Postulacion> {
+    const alumno = await this.alumnoService.findByUserId(userId);
+    const postulacion = await this.postulacionRepository.findOne({
+      where: { id: appId, alumno: { id: alumno.id } },
+      relations: ['proyecto'],
+    });
+
+    if (!postulacion) {
+      throw new NotFoundException(`Postulación con id ${appId} no encontrada`);
+    }
+
+    return postulacion;
+  }
+
+  async withdraw(projectId: string, userId: string): Promise<void> {
+    const alumno = await this.alumnoService.findByUserId(userId);
+    const postulacion = await this.postulacionRepository.findOne({
+      where: { proyecto: { id: projectId }, alumno: { id: alumno.id } },
+    });
+
+    if (!postulacion) {
+      throw new NotFoundException('No estás postulado a este proyecto');
+    }
+
+    if (postulacion.estado !== PostulacionEstado.PENDIENTE) {
+      throw new BadRequestException(
+        'Solo se puede retirar una postulación pendiente',
+      );
+    }
+
+    await this.postulacionRepository.remove(postulacion);
+  }
+
   async postular(projectId: string, userId: string): Promise<Postulacion> {
     const proyecto = await this.findProyectoOrFail(projectId);
+
+    if (proyecto.estado !== ProyectoEstado.ACTIVO) {
+      throw new BadRequestException(
+        'El proyecto no está activo y no acepta postulaciones',
+      );
+    }
+
     const alumno = await this.alumnoService.findByUserId(userId);
 
     const check = await this.postulacionRepository.findOne({
@@ -98,7 +143,23 @@ export class PostulacionesService {
     });
 
     if (check) {
-      throw new BadRequestException('Ya te postulaste a este proyecto');
+      throw new ConflictException('Ya te postulaste a este proyecto');
+    }
+
+    // cupos = 0 significa "sin límite definido" (datos existentes y default de la entity)
+    if (proyecto.cupos > 0) {
+      const aceptadas = await this.postulacionRepository.count({
+        where: {
+          proyecto: { id: projectId },
+          estado: PostulacionEstado.ACEPTADA,
+        },
+      });
+
+      if (aceptadas >= proyecto.cupos) {
+        throw new BadRequestException(
+          'El proyecto ya no tiene cupos disponibles',
+        );
+      }
     }
 
     const postulacion = this.postulacionRepository.create({

@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { 
-  Info, 
-  BrainCircuit, 
-  Calendar, 
-  Users, 
-  Hourglass, 
+import {
+  Info,
+  BrainCircuit,
+  Calendar,
+  Users,
   Plus,
   Save,
   Send,
   ChevronRight,
   FileText,
   Check,
-  X
+  X,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { proyectosService } from '@/services/proyectos';
@@ -26,7 +25,7 @@ import { cn } from '@/lib/utils';
 export function ProjectCreatePage() {
   const { token } = useAuth();
   const navigate = useNavigate();
-  
+
   // Form State
   const [titulo, setTitulo] = useState('');
   const [descripcion, setDescripcion] = useState('');
@@ -34,12 +33,12 @@ export function ProjectCreatePage() {
   const [duracion, setDuracion] = useState('1 año');
   const [fechaCierre, setFechaCierre] = useState('');
   const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([]);
-  
+
   // Loaded Data
   const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  
+
   // Custom Skills State
   const [isAddingSkill, setIsAddingSkill] = useState(false);
   const [newSkillName, setNewSkillName] = useState('');
@@ -62,8 +61,8 @@ export function ProjectCreatePage() {
   }, [token]);
 
   const toggleSkill = (id: string) => {
-    setSelectedSkillIds(prev => 
-      prev.includes(id) ? prev.filter(sid => sid !== id) : [...prev, id]
+    setSelectedSkillIds((prev) =>
+      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id],
     );
   };
 
@@ -72,14 +71,17 @@ export function ProjectCreatePage() {
 
     try {
       setCreatingSkill(true);
-      const newSkill = await skillsService.createSkill({ nombre: newSkillName.trim() }, token);
-      
+      const newSkill = await skillsService.createSkill(
+        { nombre: newSkillName.trim() },
+        token,
+      );
+
       // Añadir la nueva skill a la lista de disponibles si no está
-      setAvailableSkills(prev => [...prev, newSkill]);
-      
+      setAvailableSkills((prev) => [...prev, newSkill]);
+
       // Seleccionarla automáticamente
-      setSelectedSkillIds(prev => [...prev, newSkill.id]);
-      
+      setSelectedSkillIds((prev) => [...prev, newSkill.id]);
+
       // Limpiar y cerrar
       setNewSkillName('');
       setIsAddingSkill(false);
@@ -102,15 +104,18 @@ export function ProjectCreatePage() {
 
     try {
       setSubmitting(true);
-      await proyectosService.createProject({
-        titulo,
-        descripcion,
-        cupos,
-        duracion,
-        fechaCierre,
-        skillIds: selectedSkillIds
-      }, token);
-      
+      await proyectosService.createProject(
+        {
+          titulo,
+          descripcion,
+          cupos,
+          duracion,
+          fechaCierre,
+          skillIds: selectedSkillIds,
+        },
+        token,
+      );
+
       toast.success('Proyecto publicado exitosamente');
       navigate('/responsable/dashboard');
     } catch (error) {
@@ -135,7 +140,8 @@ export function ProjectCreatePage() {
               Crear Proyecto de Investigación
             </h2>
             <p className="mt-2 text-muted-foreground max-w-2xl font-medium">
-              Complete los detalles técnicos y académicos para la apertura de una nueva convocatoria de investigación en su laboratorio.
+              Complete los detalles técnicos y académicos para la apertura de
+              una nueva convocatoria de investigación en su laboratorio.
             </p>
           </div>
         </div>
@@ -159,30 +165,36 @@ export function ProjectCreatePage() {
                 </div>
                 Información General
               </h3>
-              
+
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1" htmlFor="title">
+                  <label
+                    className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1"
+                    htmlFor="title"
+                  >
                     Título del proyecto
                   </label>
-                  <Input 
+                  <Input
                     id="title"
                     value={titulo}
                     onChange={(e) => setTitulo(e.target.value)}
-                    placeholder="Ej: Implementación de Redes Neuronales en Redes Eléctricas" 
+                    placeholder="Ej: Implementación de Redes Neuronales en Redes Eléctricas"
                     className="h-12 bg-muted/30 border-none px-4 text-sm font-medium focus-visible:ring-1 focus-visible:ring-primary/40 rounded-xl transition-all"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1" htmlFor="description">
+                  <label
+                    className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1"
+                    htmlFor="description"
+                  >
                     Descripción detallada
                   </label>
-                  <Textarea 
+                  <Textarea
                     id="description"
                     value={descripcion}
                     onChange={(e) => setDescripcion(e.target.value)}
-                    placeholder="Describa los objetivos, metodología y alcance del proyecto..." 
+                    placeholder="Describa los objetivos, metodología y alcance del proyecto..."
                     className="min-h-[200px] bg-muted/30 border-none p-4 text-sm font-medium focus-visible:ring-1 focus-visible:ring-primary/40 rounded-xl transition-all"
                   />
                 </div>
@@ -197,15 +209,18 @@ export function ProjectCreatePage() {
                 </div>
                 Requisitos y Habilidades
               </h3>
-              
+
               <div className="space-y-4">
                 <p className="text-xs text-muted-foreground italic font-medium">
-                  Seleccione las competencias clave requeridas para los postulantes.
+                  Seleccione las competencias clave requeridas para los
+                  postulantes.
                 </p>
-                
+
                 <div className="flex flex-wrap gap-2">
                   {loading ? (
-                    <div className="text-xs text-muted-foreground animate-pulse">Cargando habilidades...</div>
+                    <div className="text-xs text-muted-foreground animate-pulse">
+                      Cargando habilidades...
+                    </div>
                   ) : (
                     availableSkills.map((skill) => {
                       const isSelected = selectedSkillIds.includes(skill.id);
@@ -215,10 +230,10 @@ export function ProjectCreatePage() {
                           type="button"
                           onClick={() => toggleSkill(skill.id)}
                           className={cn(
-                            "px-4 py-2 rounded-full text-xs font-bold transition-all border shadow-sm",
-                            isSelected 
-                              ? "bg-primary text-primary-foreground border-primary active:scale-95"
-                              : "bg-muted/50 text-muted-foreground border-border hover:border-primary/40 hover:bg-muted active:scale-95"
+                            'px-4 py-2 rounded-full text-xs font-bold transition-all border shadow-sm',
+                            isSelected
+                              ? 'bg-primary text-primary-foreground border-primary active:scale-95'
+                              : 'bg-muted/50 text-muted-foreground border-border hover:border-primary/40 hover:bg-muted active:scale-95',
                           )}
                         >
                           {skill.nombre}
@@ -243,16 +258,16 @@ export function ProjectCreatePage() {
                         placeholder="Nombre de la skill..."
                         className="h-7 text-xs border-none bg-transparent focus-visible:ring-0 w-32"
                       />
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         onClick={handleCreateSkill}
                         disabled={creatingSkill || !newSkillName.trim()}
                         className="p-1 hover:bg-primary/10 rounded-full text-primary transition-colors disabled:opacity-50"
                       >
                         <Check className="size-3" />
                       </button>
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         onClick={() => setIsAddingSkill(false)}
                         className="p-1 hover:bg-destructive/10 rounded-full text-destructive transition-colors"
                       >
@@ -260,8 +275,8 @@ export function ProjectCreatePage() {
                       </button>
                     </div>
                   ) : (
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={() => setIsAddingSkill(true)}
                       className="flex items-center gap-1 px-4 py-2 rounded-full text-xs font-bold border-2 border-dashed border-muted-foreground/30 text-muted-foreground hover:border-primary/40 hover:text-primary transition-all active:scale-95"
                     >
@@ -283,15 +298,18 @@ export function ProjectCreatePage() {
               <Calendar className="size-4" />
               Logística y Plazos
             </h3>
-            
+
             <div className="space-y-5">
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1" htmlFor="slots">
+                <label
+                  className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1"
+                  htmlFor="slots"
+                >
                   Cupos Disponibles
                 </label>
                 <div className="relative">
-                  <Input 
-                    type="number" 
+                  <Input
+                    type="number"
                     id="slots"
                     value={cupos}
                     onChange={(e) => setCupos(parseInt(e.target.value))}
@@ -302,10 +320,13 @@ export function ProjectCreatePage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1" htmlFor="duration">
+                <label
+                  className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1"
+                  htmlFor="duration"
+                >
                   Duración estimada
                 </label>
-                <select 
+                <select
                   id="duration"
                   value={duracion}
                   onChange={(e) => setDuracion(e.target.value)}
@@ -319,12 +340,15 @@ export function ProjectCreatePage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1" htmlFor="deadline">
+                <label
+                  className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1"
+                  htmlFor="deadline"
+                >
                   Cierre de inscripciones
                 </label>
                 <div className="relative">
-                  <Input 
-                    type="date" 
+                  <Input
+                    type="date"
                     id="deadline"
                     value={fechaCierre}
                     onChange={(e) => setFechaCierre(e.target.value)}
@@ -338,7 +362,7 @@ export function ProjectCreatePage() {
           {/* Form Actions */}
           <div className="bg-card rounded-2xl p-5 shadow-smooth ring-1 ring-border/10 border border-primary/5">
             <div className="flex flex-col gap-3">
-              <Button 
+              <Button
                 form="project-form"
                 type="submit"
                 disabled={submitting}
@@ -347,8 +371,8 @@ export function ProjectCreatePage() {
                 <Send className="size-4" />
                 {submitting ? 'Publicando...' : 'Publicar Proyecto'}
               </Button>
-              
-              <Button 
+
+              <Button
                 variant="outline"
                 type="button"
                 className="h-12 bg-muted/10 text-muted-foreground font-bold rounded-xl border-dashed hover:bg-muted/30 transition-all flex items-center justify-center gap-2"
@@ -358,20 +382,23 @@ export function ProjectCreatePage() {
               </Button>
             </div>
             <p className="text-[10px] text-center text-muted-foreground mt-4 px-2 leading-relaxed font-semibold uppercase tracking-tighter opacity-70">
-              Al publicar, el proyecto será visible para todos los estudiantes en el portal de laboratorios.
+              Al publicar, el proyecto será visible para todos los estudiantes
+              en el portal de laboratorios.
             </p>
           </div>
 
           {/* Decorative Context Image */}
           <div className="hidden lg:block rounded-2xl overflow-hidden shadow-smooth relative h-44 group ring-1 ring-border/5">
             <div className="absolute inset-0 z-10 bg-gradient-to-t from-primary/60 to-transparent"></div>
-            <img 
-              alt="Lab Context" 
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+            <img
+              alt="Lab Context"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBC_vBGN4c4TzmzmvqVK301YYTG5esTg5Oh7-o-uuOqyWerREiqY82OdP3zXGQ08HjOkUniss6TuoTphQ6MOoHDs85wmmTaiLYjMjpFb5ForvrER7ei3Dxb0k0wLHMca4V2hx4v7i6OI0ZO8RgpAm2TAmoYNxMIMtmSM4UzCi8gpCqURIdZunutK1P5Q9xeosQ_isQ4ExBPXu585j7Itm5MApu-_Bn4UhL83BCm4LA_wrMWb2RGrGnZHg3fZFccfQhYCUD1wVpgjVIE"
             />
             <div className="absolute inset-x-0 bottom-4 z-20 px-6 text-center">
-              <p className="text-white text-xs font-bold leading-tight drop-shadow-sm uppercase tracking-wider">Impulsando el futuro de la ingeniería desde la UTN.</p>
+              <p className="text-white text-xs font-bold leading-tight drop-shadow-sm uppercase tracking-wider">
+                Impulsando el futuro de la ingeniería desde la UTN.
+              </p>
             </div>
           </div>
         </aside>
@@ -379,4 +406,3 @@ export function ProjectCreatePage() {
     </div>
   );
 }
-

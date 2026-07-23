@@ -6,14 +6,18 @@ import type {
   ProjectsPage,
 } from '@/types/projects';
 
-async function request<T>(path: string, token: string): Promise<T> {
+async function doFetch(
+  path: string,
+  token: string,
+  method: 'GET' | 'POST' | 'DELETE',
+): Promise<Response> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10_000);
 
   let res: Response;
   try {
     res = await fetch(`${API_URL}${path}`, {
-      method: 'GET',
+      method,
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
@@ -36,40 +40,22 @@ async function request<T>(path: string, token: string): Promise<T> {
     throw new Error(error.message ?? 'Error en la solicitud');
   }
 
+  return res;
+}
+
+async function request<T>(path: string, token: string): Promise<T> {
+  const res = await doFetch(path, token, 'GET');
   return res.json() as Promise<T>;
 }
 
 async function post<T>(path: string, token: string): Promise<T> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10_000);
-
-  let res: Response;
-  try {
-    res = await fetch(`${API_URL}${path}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      signal: controller.signal,
-    });
-  } catch (err) {
-    if (err instanceof Error && err.name === 'AbortError') {
-      throw new Error('El servidor no responde. Verificá tu conexión.');
-    }
-    throw new Error('No se pudo conectar con el servidor.');
-  } finally {
-    clearTimeout(timeout);
-  }
-
-  if (!res.ok) {
-    const error = await res
-      .json()
-      .catch(() => ({ message: 'Error desconocido' }));
-    throw new Error(error.message ?? 'Error en la solicitud');
-  }
-
+  const res = await doFetch(path, token, 'POST');
   return res.json() as Promise<T>;
+}
+
+// No parsea el body: el backend responde 200 sin contenido en los DELETE
+async function del(path: string, token: string): Promise<void> {
+  await doFetch(path, token, 'DELETE');
 }
 
 export const projectsService = {
@@ -91,6 +77,14 @@ export const projectsService = {
 
   getMyApplications(token: string): Promise<MyApplication[]> {
     return request<MyApplication[]>('/applications/my', token);
+  },
+
+  getMyApplicationById(token: string, id: string): Promise<MyApplication> {
+    return request<MyApplication>(`/applications/${id}`, token);
+  },
+
+  withdrawApplication(token: string, projectId: string): Promise<void> {
+    return del(`/projects/${projectId}/apply`, token);
   },
 
   applyToProject(
