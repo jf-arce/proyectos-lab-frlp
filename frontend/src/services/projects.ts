@@ -4,6 +4,7 @@ import type {
   ProjectDetail,
   ProjectFilters,
   ProjectsPage,
+  RecommendedProject,
 } from '@/types/projects';
 
 async function doFetch(
@@ -73,6 +74,10 @@ export const projectsService = {
 
   findById(token: string, id: string): Promise<ProjectDetail> {
     return request<ProjectDetail>(`/projects/${id}`, token);
+  },
+
+  getRecommended(token: string): Promise<RecommendedProject[]> {
+    return request<RecommendedProject[]>('/projects/recommended', token);
   },
 
   getMyApplications(token: string): Promise<MyApplication[]> {

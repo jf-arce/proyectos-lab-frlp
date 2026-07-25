@@ -73,3 +73,21 @@ export interface MyApplication {
   updatedAt: string;
   proyecto: MyApplicationProject;
 }
+
+export interface RecommendedProjectData {
+  id: string;
+  titulo: string;
+  descripcion: string;
+  estado: 'ACTIVO' | 'CERRADO';
+  cupos: number;
+  duracion: string | null;
+  fechaCierre: string | null;
+  createdAt: string;
+  laboratorio: ProjectLaboratorio;
+  skills: ProjectSkill[];
+}
+
+export interface RecommendedProject {
+  score: number;
+  project: RecommendedProjectData;
+}

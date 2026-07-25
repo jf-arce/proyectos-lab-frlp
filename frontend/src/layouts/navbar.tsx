@@ -1,4 +1,4 @@
-import { Bell, ChevronDown, Moon, Sun, UserPlus } from 'lucide-react';
+import { ChevronDown, Moon, Sun, UserPlus } from 'lucide-react';
 import { Link, NavLink } from 'react-router';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,12 +20,18 @@ import { useTheme } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { AddResponsableDialog } from '@/pages/responsable/components/add-responsable-dialog';
-import { usePerfilAlumno } from '@/hooks/use-perfil-alumno';
+import { NotificationsDropdown } from '@/components/notifications-dropdown';
+import { Role } from '@/types/auth';
 
-const navLinks = [
+const alumnoNavLinks = [
   { to: '/alumno/dashboard', label: 'Inicio' },
   { to: '/alumno/laboratorios', label: 'Laboratorios' },
   { to: '/alumno/postulaciones', label: 'Mis Postulaciones' },
+];
+
+const responsableNavLinks = [
+  { to: '/responsable/dashboard', label: 'Inicio' },
+  { to: '/responsable/proyectos', label: 'Mis Proyectos' },
 ];
 
 export function Navbar() {
@@ -36,9 +42,17 @@ export function Navbar() {
     ? (user.nombre[0] + user.apellido[0]).toUpperCase()
     : '?';
 
-  const { isOnboarding } = usePerfilAlumno();
+  // Determinar rol del usuario
+  const isAlumno = user?.role === Role.ALUMNO;
+  const isResponsable = user?.role === Role.RESPONSABLE_LABORATORIO;
 
-  if (isOnboarding) return;
+  // No mostrar navbar si es alumno en onboarding
+  // Nota: Para alumnos, el onboarding se detecta cuando no tienen perfil completo
+  // Por ahora asumimos que si tienen usuario, completaron el onboarding
+  if (!user) return;
+
+  // Seleccionar links según el rol
+  const navLinks = isAlumno ? alumnoNavLinks : isResponsable ? responsableNavLinks : [];
 
   return (
     <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-sm shadow-nav border-b border-border/40">
@@ -75,15 +89,7 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative p-4"
-            press={false}
-          >
-            <Bell />
-            <span className="absolute top-2 right-2 size-1.5 rounded-full bg-red-500" />
-          </Button>
+          <NotificationsDropdown />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

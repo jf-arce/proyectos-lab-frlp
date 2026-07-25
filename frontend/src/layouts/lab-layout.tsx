@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { responsableService } from '@/services/responsable';
 import { UserPlus } from 'lucide-react';
 import { AddResponsableDialog } from '@/pages/responsable/components/add-responsable-dialog';
+import { NotificationsDropdown } from '@/components/notifications-dropdown';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -184,6 +185,9 @@ export function LabLayout() {
 
       {/* Main Content Canvas */}
       <main className="ml-64 w-full p-8 px-10">
+        <div className="flex justify-end mb-4 -mt-2">
+          <NotificationsDropdown />
+        </div>
         <Outlet />
       </main>
       <AddResponsableDialog

@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Proyecto } from '@/modules/proyectos/entities/proyecto.entity';
 import { ProyectoEstado } from '@/modules/proyectos/enums/proyectos-estados.enum';
@@ -32,6 +32,7 @@ export class PostulacionesService {
     private readonly proyectoRepository: Repository<Proyecto>,
     private readonly eventEmitter: EventEmitter2,
     private readonly alumnoService: AlumnoService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async getApplications(
@@ -52,34 +53,44 @@ export class PostulacionesService {
     dto: UpdatePostulacionEstadoDto,
     laboratorioId: string,
   ): Promise<Postulacion> {
-    const postulacion = await this.postulacionRepository.findOne({
-      where: { id: appId },
-      relations: { proyecto: { laboratorio: true } },
-    });
-
-    if (!postulacion) {
-      throw new NotFoundException(`Postulación con id ${appId} no encontrada`);
-    }
-
-    if (postulacion.proyecto.laboratorio.id !== laboratorioId) {
-      throw new ForbiddenException(
-        'No tenés permiso para modificar esta postulación',
-      );
-    }
-
     if (dto.estado === PostulacionEstado.PENDIENTE) {
       throw new BadRequestException('No se puede volver al estado PENDIENTE');
     }
 
-    const esTerminal =
-      postulacion.estado === PostulacionEstado.ACEPTADA ||
-      postulacion.estado === PostulacionEstado.RECHAZADA;
-    if (esTerminal) {
-      throw new BadRequestException('La postulación ya fue resuelta');
-    }
+    // Se usa una transacción con lock pesimista sobre la fila para evitar
+    // condiciones de carrera (p. ej. doble click) que permitirían procesar
+    // la misma postulación dos veces y disparar notificaciones duplicadas.
+    const updated = await this.dataSource.transaction(async (manager) => {
+      const postulacion = await manager
+        .createQueryBuilder(Postulacion, 'postulacion')
+        .innerJoinAndSelect('postulacion.proyecto', 'proyecto')
+        .innerJoinAndSelect('proyecto.laboratorio', 'laboratorio')
+        .where('postulacion.id = :appId', { appId })
+        .setLock('pessimistic_write')
+        .getOne();
 
-    postulacion.estado = dto.estado;
-    const updated = await this.postulacionRepository.save(postulacion);
+      if (!postulacion) {
+        throw new NotFoundException(
+          `Postulación con id ${appId} no encontrada`,
+        );
+      }
+
+      if (postulacion.proyecto.laboratorio.id !== laboratorioId) {
+        throw new ForbiddenException(
+          'No tenés permiso para modificar esta postulación',
+        );
+      }
+
+      const esTerminal =
+        postulacion.estado === PostulacionEstado.ACEPTADA ||
+        postulacion.estado === PostulacionEstado.RECHAZADA;
+      if (esTerminal) {
+        throw new BadRequestException('La postulación ya fue resuelta');
+      }
+
+      postulacion.estado = dto.estado;
+      return manager.save(postulacion);
+    });
 
     const event = new PostulacionEstadoActualizadoEvent();
     event.postulacionId = updated.id;

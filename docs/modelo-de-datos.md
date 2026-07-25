@@ -8,7 +8,7 @@ La plataforma centraliza la publicación de proyectos de laboratorio y la postul
 
 ## Decisiones de diseño
 
-- **Un responsable gestiona un solo laboratorio.** La relación es 1:1 entre `RESPONSABLE_LABORATORIO` y `LABORATORIO`. Si en el futuro se requiere que un responsable gestione varios laboratorios, esta FK se migra a una tabla pivote.
+- **Un responsable gestiona un solo laboratorio, pero un laboratorio puede tener varios responsables.** La relación es N:1 entre `RESPONSABLE_LABORATORIO` y `LABORATORIO` (feature "Agregar responsable": un responsable autenticado puede invitar a otro para su mismo laboratorio). Si en el futuro se requiere que un responsable gestione varios laboratorios, se migra a una tabla pivote M:N.
 - **Skills con dos modos.** Existe un catálogo predefinido de habilidades (gestionado por el sistema) y la posibilidad de que cada alumno agregue skills personalizadas propias. Los responsables de laboratorio solo pueden usar el catálogo predefinido al definir los requisitos de un proyecto.
 - **Repostulación controlada por backend.** La base de datos permite múltiples postulaciones de un mismo alumno a un mismo proyecto en distintos momentos. La lógica de restricción temporal (por ejemplo, no repostularse hasta pasados X días de un rechazo) se implementa en la capa de negocio del backend.
 - **CV con doble modalidad.** El alumno puede cargar un archivo al servidor, indicar un link externo, o ambos. Ambos campos son opcionales (nullables).
