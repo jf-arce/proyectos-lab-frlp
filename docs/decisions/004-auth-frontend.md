@@ -1,4 +1,4 @@
-# 001 — Autenticación: implementación en el frontend
+# 004 — Autenticación: implementación en el frontend
 
 ## Decisiones
 
@@ -9,7 +9,7 @@
 
 ### 2. `AuthContext`
 
-`src/context/auth-context.tsx` expone:
+`frontend/src/context/auth-context.tsx` expone:
 
 ```ts
 {
@@ -37,7 +37,7 @@ El usuario nunca percibe la renovación mientras el refresh token sea válido (7
 
 ### 5. `PrivateRoute`
 
-`src/components/private-route.tsx` protege rutas por rol:
+`frontend/src/components/private-route.tsx` protege rutas por rol:
 
 ```
 isLoading        → null (evita flash de redirección)

@@ -1,52 +1,52 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  ProjectCardRecommended,
-  type RecommendedProject,
-} from './project-card-recommended';
+import { useAuth } from '@/hooks/use-auth';
+import { usePerfilContext } from '@/context/perfil-context';
+import { projectsService } from '@/services/projects';
+import type { RecommendedProject } from '@/types/projects';
+import { ProjectCardRecommended } from './project-card-recommended';
 
-const recommendedProjects: RecommendedProject[] = [
-  {
-    id: 1,
-    titulo: 'Optimización de Redes Neuronales',
-    descripcion:
-      'Investigación sobre la reducción de latencia en modelos transformadores para dispositivos embebidos.',
-    laboratorio: { nombre: 'LIDIC - Sistemas de Cómputo' },
-    skills: [
-      { nombre: 'Python', categoria: 'Lenguaje' },
-      { nombre: 'PyTorch', categoria: 'Framework' },
-      { nombre: 'CUDA', categoria: 'Hardware' },
-    ],
-    match: 92,
-  },
-  {
-    id: 2,
-    titulo: 'Micro-redes Eléctricas Inteligentes',
-    descripcion:
-      'Simulación de balance de carga en entornos industriales utilizando energías renovables mixtas.',
-    laboratorio: { nombre: 'GESE - Grupo de Energía' },
-    skills: [
-      { nombre: 'MATLAB', categoria: 'Herramienta' },
-      { nombre: 'Simulink', categoria: 'Herramienta' },
-    ],
-    match: 85,
-  },
-  {
-    id: 3,
-    titulo: 'Plataforma Interoperable de Salud',
-    descripcion:
-      'Desarrollo de APIs seguras bajo estándar HL7 FHIR para integración de historias clínicas.',
-    laboratorio: { nombre: 'LIS - Lab de Ing. de Software' },
-    skills: [
-      { nombre: 'Java', categoria: 'Lenguaje' },
-      { nombre: 'FHIR', categoria: 'Estándar' },
-      { nombre: 'PostgreSQL', categoria: 'Base de datos' },
-    ],
-    match: 78,
-  },
-];
+const PAGE_SIZE = 2;
 
 export function RecommendedProjectsSection() {
+  const { token } = useAuth();
+  const { profile } = usePerfilContext();
+
+  const [recommendations, setRecommendations] = useState<RecommendedProject[]>(
+    [],
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
+
+  useEffect(() => {
+    if (!token) return;
+    setIsLoading(true);
+    projectsService
+      .getRecommended(token)
+      .then((data) => {
+        setRecommendations(data);
+        setError(null);
+      })
+      .catch((err: unknown) => {
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Error al cargar proyectos recomendados',
+        );
+      })
+      .finally(() => setIsLoading(false));
+  }, [token]);
+
+  const hasSkills = (profile?.skills.length ?? 0) > 0;
+  const totalPages = Math.ceil(recommendations.length / PAGE_SIZE);
+  const visibleProjects = recommendations.slice(
+    page * PAGE_SIZE,
+    page * PAGE_SIZE + PAGE_SIZE,
+  );
+
   return (
     <section className="rounded-2xl p-6 bg-card/60 border border-input">
       <div className="flex items-center justify-between mb-6">
@@ -58,21 +58,70 @@ export function RecommendedProjectsSection() {
             Basado en tu perfil y habilidades cargadas.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="icon">
-            <ChevronLeft />
-          </Button>
-          <Button variant="outline" size="icon">
-            <ChevronRight />
-          </Button>
-        </div>
+        {totalPages > 1 && (
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="Anteriores"
+              disabled={page === 0}
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+            >
+              <ChevronLeft />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="Siguientes"
+              disabled={page >= totalPages - 1}
+              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+            >
+              <ChevronRight />
+            </Button>
+          </div>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
-        {recommendedProjects.slice(0, 2).map((project) => (
-          <ProjectCardRecommended key={project.id} project={project} />
-        ))}
-      </div>
+      {isLoading && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+            <div key={i} className="h-64 rounded-xl bg-muted animate-pulse" />
+          ))}
+        </div>
+      )}
+
+      {!isLoading && error && (
+        <p className="text-sm text-destructive text-center py-8">{error}</p>
+      )}
+
+      {!isLoading && !error && !hasSkills && (
+        <p className="text-sm text-muted-foreground text-center py-8">
+          Todavía no cargaste habilidades en tu perfil.{' '}
+          <Link to="/alumno/perfil" className="text-primary font-semibold underline">
+            Completá tu perfil
+          </Link>{' '}
+          para recibir recomendaciones personalizadas.
+        </p>
+      )}
+
+      {!isLoading && !error && hasSkills && recommendations.length === 0 && (
+        <p className="text-sm text-muted-foreground text-center py-8">
+          No encontramos proyectos activos que coincidan con tus habilidades
+          por el momento.
+        </p>
+      )}
+
+      {!isLoading && !error && visibleProjects.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+          {visibleProjects.map(({ project, score }) => (
+            <ProjectCardRecommended
+              key={project.id}
+              project={project}
+              score={score}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

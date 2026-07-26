@@ -13,7 +13,7 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { useAuth } from '@/hooks/use-auth';
 import {
   Dialog,
@@ -41,6 +41,8 @@ import { cn } from '@/lib/utils';
 
 export function ResponsableDashboardPage() {
   const { token } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -50,6 +52,7 @@ export function ResponsableDashboardPage() {
   const [isEditProjectOpen, setIsEditProjectOpen] = useState(false);
   const [applicants, setApplicants] = useState<Postulacion[]>([]);
   const [loadingApplicants, setLoadingApplicants] = useState(false);
+  const [updatingApplicationId, setUpdatingApplicationId] = useState<string | null>(null);
 
   // Edit form state
   const [editTitle, setEditTitle] = useState('');
@@ -108,6 +111,23 @@ export function ResponsableDashboardPage() {
     }
   };
 
+  // Si se llegó desde una notificación de "nueva postulación", abrir
+  // directamente el diálogo de postulantes del proyecto correspondiente.
+  useEffect(() => {
+    const projectId = (
+      location.state as { openApplicantsForProjectId?: string } | null
+    )?.openApplicantsForProjectId;
+    if (!projectId || proyectos.length === 0) return;
+
+    const proyecto = proyectos.find((p) => p.id === projectId);
+    if (proyecto) {
+      handleOpenApplicants(proyecto);
+    }
+    // Limpiar el state para no reabrir el diálogo en un refresh/back.
+    navigate(location.pathname, { replace: true, state: {} });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [proyectos, location.state]);
+
   const handleOpenApplicants = async (proyecto: Proyecto) => {
     setSelectedProject(proyecto);
     setIsViewApplicantsOpen(true);
@@ -131,11 +151,15 @@ export function ResponsableDashboardPage() {
     status: 'EN_REVISION' | 'ACEPTADA' | 'RECHAZADA',
   ) => {
     if (!token || !selectedProject) return;
+    // Evita doble submit (p. ej. doble click) que dispararía dos eventos
+    // de cambio de estado y, por lo tanto, dos notificaciones duplicadas.
+    if (updatingApplicationId) return;
     const toastText: Record<typeof status, string> = {
       EN_REVISION: 'Postulación marcada en revisión',
       ACEPTADA: 'Postulación aceptada',
       RECHAZADA: 'Postulación rechazada',
     };
+    setUpdatingApplicationId(applicationId);
     try {
       await proyectosService.updateApplicationStatus(
         applicationId,
@@ -153,6 +177,8 @@ export function ResponsableDashboardPage() {
       fetchProyectos();
     } catch {
       toast.error('Error al procesar postulación');
+    } finally {
+      setUpdatingApplicationId(null);
     }
   };
 
@@ -569,6 +595,7 @@ export function ResponsableDashboardPage() {
                             size="sm"
                             variant="ghost"
                             className="h-9 px-4 text-xs font-bold text-primary hover:bg-primary/10 rounded-lg transition-all"
+                            disabled={updatingApplicationId === post.id}
                             onClick={() =>
                               handleUpdateApplication(post.id, 'EN_REVISION')
                             }
@@ -580,6 +607,7 @@ export function ResponsableDashboardPage() {
                           size="sm"
                           variant="ghost"
                           className="h-9 px-4 text-xs font-bold text-destructive hover:bg-destructive/10 rounded-lg transition-all"
+                          disabled={updatingApplicationId === post.id}
                           onClick={() =>
                             handleUpdateApplication(post.id, 'RECHAZADA')
                           }
@@ -589,6 +617,7 @@ export function ResponsableDashboardPage() {
                         <Button
                           size="sm"
                           className="h-9 px-5 text-xs font-bold rounded-lg shadow-md hover:scale-105 active:scale-95 transition-all"
+                          disabled={updatingApplicationId === post.id}
                           onClick={() =>
                             handleUpdateApplication(post.id, 'ACEPTADA')
                           }

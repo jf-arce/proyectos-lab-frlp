@@ -54,23 +54,29 @@ export class NotificationsListener {
       const { alumno, proyecto } = postulacion;
       const laboratorioId = proyecto.laboratorio.id;
 
-      // Buscar al responsable del laboratorio
-      const responsable = await this.responsableRepository.findOne({
+      // Un laboratorio puede tener más de un responsable (ver
+      // "Agregar responsable"), por lo que se notifica a todos, no solo
+      // al primero que devuelva la consulta.
+      const responsables = await this.responsableRepository.find({
         where: { laboratorio: { id: laboratorioId } },
         relations: ['usuario'],
       });
 
-      if (!responsable) return;
+      if (responsables.length === 0) return;
 
       const mensaje = `${alumno.nombre} ${alumno.apellido} se postuló al proyecto "${proyecto.titulo}".`;
 
-      await this.notificationsService.create({
-        usuarioId: responsable.usuario.id,
-        postulacion,
-        tipo: NotificationType.NUEVA_POSTULACION,
-        mensaje,
-        emailEnviado: false,
-      });
+      await Promise.all(
+        responsables.map((responsable) =>
+          this.notificationsService.create({
+            usuarioId: responsable.usuario.id,
+            postulacion,
+            tipo: NotificationType.NUEVA_POSTULACION,
+            mensaje,
+            emailEnviado: false,
+          }),
+        ),
+      );
     } catch (error) {
       this.logger.error(
         `Error procesando evento ${POSTULACION_CREADA}: ${(error as Error).message}`,
@@ -110,7 +116,7 @@ export class NotificationsListener {
       const mensaje = mensajesPorEstado[nuevoEstado];
 
       // Notificación in-app
-      await this.notificationsService.create({
+      const notificacion = await this.notificationsService.create({
         usuarioId: alumno.usuario.id,
         postulacion,
         tipo: NotificationType.ESTADO_ACTUALIZADO,
@@ -127,14 +133,11 @@ export class NotificationsListener {
           nuevoEstado,
         })
         .then(async () => {
-          // Marcar email como enviado
-          await this.notificationsService.create({
-            usuarioId: alumno.usuario.id,
-            postulacion,
-            tipo: NotificationType.ESTADO_ACTUALIZADO,
-            mensaje,
-            emailEnviado: true,
-          });
+          // Marcar email como enviado (update, no crear nueva notificación)
+          await this.notificationsService.updateEmailEnviado(
+            notificacion.id,
+            true,
+          );
         })
         .catch((err: Error) =>
           this.logger.error(`Error enviando email: ${err.message}`),

@@ -141,3 +141,19 @@ SMTP_FROM="Portal Lab FRLP <no-reply@example.com>"
 - Para MVP, el polling desde el frontend cada 30 s es suficiente. Si se decide tiempo real, usar **Server-Sent Events (SSE)** con el decorador `@Sse()` de NestJS — es más simple que WebSockets para este caso de uso unidireccional.
 - Considerar un límite de notificaciones mostradas (últimas 50) y limpieza periódica de notificaciones antiguas leídas.
 - En `notifications.module.ts`, importar `EventEmitterModule` desde el módulo raíz y asegurarse de que `EventEmitter2` esté disponible globalmente.
+
+## Bugs corregidos
+
+- **Icono de notificación ausente en vistas del responsable**: `LabLayout` (`frontend/src/layouts/lab-layout.tsx`), usado por todas las rutas `/responsable/*` (incluido el perfil), nunca renderizaba `NotificationsDropdown`. Solo `Navbar` (usado por `StudentLayout` para el alumno) lo incluía. Se agregó `<NotificationsDropdown />` al área principal de `LabLayout`.
+- **Notificación duplicada al aceptar/rechazar/marcar en revisión una postulación**: los botones de acción en `ResponsableDashboardPage` (`frontend/src/pages/responsable/dashboard-page.tsx`) no se deshabilitaban durante la petición, permitiendo doble click. Además, `PostulacionesService.updateApplicationStatus` (backend) leía y validaba el estado de la postulación sin bloqueo, permitiendo una condición de carrera donde dos requests casi simultáneos pasaban la validación `esTerminal` y ambos emitían `POSTULACION_ESTADO_ACTUALIZADO`, generando dos notificaciones para el mismo evento. Se corrigió en dos capas:
+  - Frontend: se agregó estado `updatingApplicationId` para deshabilitar los botones de acción mientras la petición está en curso.
+  - Backend: `updateApplicationStatus` ahora usa `DataSource.transaction` con `lock: { mode: 'pessimistic_write' }` sobre la fila de la `Postulacion`, garantizando atomicidad read-check-update. Nota: el lock requiere `INNER JOIN` explícito (query builder) hacia `proyecto`/`laboratorio`, ya que Postgres no permite `FOR UPDATE` sobre el lado nullable de un `LEFT JOIN` (que es lo que genera por defecto la opción `relations` de TypeORM).
+- **Notificación de nueva postulación nunca llega a algunos responsables**: un laboratorio puede tener más de un responsable (feature "Agregar responsable"). `NotificationsListener.handlePostulacionCreada` usaba `findOne()` para buscar "el" responsable del laboratorio, notificando siempre a uno solo (arbitrario). Se corrigió para usar `find()` y notificar a **todos** los responsables del laboratorio.
+- **Botón "Revisar postulación" no redirigía al diálogo**: `NotificationsService.findByUser` solo pedía `relations: ['postulacion']`. Aunque `Proyecto` y `Alumno` están marcados `eager: true` en la entidad `Postulacion`, TypeORM no cascadea el eager-loading a través de una relación indirecta cargada vía `relations` de otro repositorio (confirmado con `curl` directo a `GET /api/notifications`: el campo `postulacion.proyecto` no llegaba en la respuesta). Se corrigió agregando explícitamente `'postulacion.proyecto'` y `'postulacion.alumno'` al array de `relations`.
+
+## Acción directa desde la notificación (responsable)
+
+En `NotificationsDropdown` (`frontend/src/components/notifications-dropdown.tsx`), cuando el usuario autenticado es RESPONSABLE_LABORATORIO y la notificación es de tipo `NUEVA_POSTULACION`, se muestra un botón "Revisar postulación" que:
+1. Marca la notificación como leída.
+2. Navega a `/responsable/dashboard` pasando `state: { openApplicantsForProjectId }`.
+3. `ResponsableDashboardPage` detecta ese state al montar/cargar los proyectos y abre automáticamente el diálogo de postulantes ("Ver Postulantes") del proyecto correspondiente, limpiando el state después para evitar reaperturas en refresh/back.

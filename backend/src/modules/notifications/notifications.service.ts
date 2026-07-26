@@ -35,7 +35,7 @@ export class NotificationsService {
   findByUser(usuarioId: string): Promise<Notificacion[]> {
     return this.notificacionRepository.find({
       where: { usuario: { id: usuarioId } },
-      relations: ['postulacion'],
+      relations: ['postulacion', 'postulacion.proyecto', 'postulacion.alumno'],
       order: { createdAt: 'DESC' },
     });
   }
@@ -61,6 +61,13 @@ export class NotificationsService {
     await this.notificacionRepository.update(
       { usuario: { id: usuarioId }, leida: false },
       { leida: true },
+    );
+  }
+
+  async updateEmailEnviado(id: string, emailEnviado: boolean): Promise<void> {
+    await this.notificacionRepository.update(
+      { id },
+      { emailEnviado },
     );
   }
 }

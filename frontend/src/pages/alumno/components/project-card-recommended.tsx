@@ -1,4 +1,5 @@
 import { FlaskConical } from 'lucide-react';
+import { Link } from 'react-router';
 import {
   Card,
   CardContent,
@@ -9,22 +10,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SkillTag } from '@/components/ui/skill-tag';
-
-export interface RecommendedProject {
-  id: number;
-  titulo: string;
-  descripcion: string;
-  laboratorio: { nombre: string };
-  skills: { nombre: string; categoria?: string }[];
-  match: number;
-}
+import type { RecommendedProjectData } from '@/types/projects';
 
 export function ProjectCardRecommended({
   project,
+  score,
 }: {
-  project: RecommendedProject;
+  project: RecommendedProjectData;
+  score: number;
 }) {
   const extraSkills = project.skills.length - 3;
+  const matchPercent = Math.round(score * 100);
 
   return (
     <Card className="px-1 py-5 flex flex-col shadow-card hover:shadow-card-hover transition-shadow duration-200">
@@ -34,7 +30,7 @@ export function ProjectCardRecommended({
             variant="outline"
             className="font-semibold text-primary border-primary/30 shrink-0"
           >
-            {project.match}% Match
+            {matchPercent}% Match
           </Badge>
         </div>
         <CardTitle className="font-display text-base font-semibold leading-snug">
@@ -55,7 +51,7 @@ export function ProjectCardRecommended({
 
         <div className="flex flex-wrap gap-1.5 mb-4 flex-1">
           {project.skills.slice(0, 3).map((skill) => (
-            <SkillTag key={skill.nombre}>{skill.nombre}</SkillTag>
+            <SkillTag key={skill.id}>{skill.nombre}</SkillTag>
           ))}
           {extraSkills > 0 && (
             <span className="text-xs text-muted-foreground self-center">
@@ -66,8 +62,8 @@ export function ProjectCardRecommended({
       </CardContent>
 
       <div className="px-4">
-        <Button variant="default" className="h-10 w-full">
-          Ver detalles
+        <Button variant="default" className="h-10 w-full" asChild>
+          <Link to={`/alumno/proyecto/${project.id}`}>Ver detalles</Link>
         </Button>
       </div>
     </Card>

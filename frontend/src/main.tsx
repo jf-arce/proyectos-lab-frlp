@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Outlet, RouterProvider, createBrowserRouter } from 'react-router';
 import { Toaster } from 'sonner';
 import { AuthProvider } from '@/context/auth-context';
+import { AppProviders } from '@/components/app-providers';
 import { publicRoutes } from '@/routes/public-routes';
 import { alumnoRoutes } from '@/routes/alumno-routes';
 import { responsableRoutes } from '@/routes/responsable-routes';
@@ -12,8 +13,10 @@ const router = createBrowserRouter([
   {
     element: (
       <AuthProvider>
-        <Toaster position="bottom-right" />
-        <Outlet />
+        <AppProviders>
+          <Toaster position="bottom-right" />
+          <Outlet />
+        </AppProviders>
       </AuthProvider>
     ),
     children: [...publicRoutes, ...alumnoRoutes, ...responsableRoutes],

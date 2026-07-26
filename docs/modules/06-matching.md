@@ -125,3 +125,11 @@ components/projects/
 - Para MVP, el cálculo en cada request es aceptable dado que el volumen de proyectos en un laboratorio universitario es bajo (< 100 proyectos activos). No optimizar prematuramente.
 - Si se decide cachear, usar `Map<userId, ScoredProject[]>` en memoria con timestamp, o Redis si ya está disponible en la infraestructura.
 - Los proyectos excluidos del matching (postulados, cerrados) deben aun ser accesibles desde el listado general — solo se excluyen de la vista de recomendaciones.
+
+## Estado de implementación (frontend conectado)
+
+El frontend ya consume el endpoint real:
+- `frontend/src/types/projects.ts`: `RecommendedProject { score, project }` y `RecommendedProjectData`.
+- `frontend/src/services/projects.ts`: `projectsService.getRecommended(token)` → `GET /projects/recommended`.
+- `frontend/src/pages/alumno/components/recommended-projects-section.tsx`: reemplazado el array hardcodeado por datos reales, con paginación (flechas ◀▶ con `PAGE_SIZE = 2`), estados de loading/error/vacío, y mensaje invitando a completar el perfil si el alumno no tiene skills cargadas.
+- `frontend/src/pages/alumno/components/project-card-recommended.tsx`: usa `RecommendedProjectData` + `score` reales; el botón "Ver detalles" navega a `/alumno/proyecto/:id`.
